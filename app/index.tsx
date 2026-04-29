@@ -7,6 +7,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function Index() {
   const [showSearch, setShowSearch] = React.useState(false);
+  const [locations, setLocation] = React.useState([1,2,3]);
   return (
     <View style={{ flex: 1, position: "relative" }}>
       <StatusBar style="light" />
@@ -66,6 +67,19 @@ export default function Index() {
               <Ionicons name="search" color="white" size={25} />
             </TouchableOpacity>
           </View>
+          {
+            locations.length > 0 && showSearch ? (
+              <View className="absolute w-full bg-gray-300 top-16 rounded-3xl">
+                {
+                  locations.map((location, index) => (
+                    <TouchableOpacity key={index}>
+                      <Text>meow</Text>
+                    </TouchableOpacity>
+                  ))
+                }
+              </View>
+            ) : null
+          }
         </View>
       </SafeAreaView>
     </View>
