@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Image, TextInput, View } from "react-native";
+import { Image, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
@@ -18,6 +18,11 @@ export default function Index() {
             <View className="flex-row justify-end items-center rounded-full" style={{backgroundColor: 'white'}}>
               <TextInput placeholder="Search city" placeholderTextColor={'lightgray'} 
               className="pl-6 h-10 flex-1 text-base text-white"/>
+              
+              {/* Search button */}
+              <TouchableOpacity style={{backgroundColor: 'white'}} className="p-3 rounded-full m-1">
+            
+              </TouchableOpacity>
             </View>
           </View>
       </SafeAreaView>
