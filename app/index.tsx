@@ -5,26 +5,59 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   return (
-    <View className="flex-1 relative">
+    <View style={{ flex: 1, position: "relative" }}>
       <StatusBar style="light" />
-      <Image blurRadius={150} source={require("../assets/images/bg.png")} className="absolute w-full h-full" />
-      
-      <SafeAreaView className="flex flex-1">
-          {/* Search section */}
-          
-          <View style={{height: '7%'}} className="mx-4 relative z-50">
-            
-            {/* Search input */}
-            <View className="flex-row justify-end items-center rounded-full" style={{backgroundColor: 'white'}}>
-              <TextInput placeholder="Search city" placeholderTextColor={'lightgray'} 
-              className="pl-6 h-10 flex-1 text-base text-white"/>
-              
-              {/* Search button */}
-              <TouchableOpacity style={{backgroundColor: 'white'}} className="p-3 rounded-full m-1">
-            
-              </TouchableOpacity>
-            </View>
+
+      <Image
+        blurRadius={150}
+        source={require("../assets/images/bg.png")}
+        style={{ position: "absolute", width: "100%", height: "100%" }}
+      />
+
+      <SafeAreaView style={{ flex: 1 }}>
+        {/* Search section */}
+        <View
+          style={{
+            height: "7%",
+            marginHorizontal: 16,
+            position: "relative",
+            zIndex: 50,
+          }}
+        >
+          {/* Search input */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              borderRadius: 9999,
+              backgroundColor: "white",
+            }}
+          >
+            <TextInput
+              placeholder="Search city"
+              placeholderTextColor={"lightgray"}
+              style={{
+                paddingLeft: 24,
+                height: 40,
+                flex: 1,
+                fontSize: 16,
+                color: "white",
+              }}
+            />
+
+            {/* Search button */}
+            <TouchableOpacity
+              style={{
+                backgroundColor: "white",
+                padding: 12,
+                borderRadius: 9999,
+                margin: 4,
+              }}
+            >
+            </TouchableOpacity>
           </View>
+        </View>
       </SafeAreaView>
     </View>
   );
