@@ -33,7 +33,7 @@ export default function Index() {
               flexDirection: "row",
               alignItems: "center",
               borderRadius: 9999,
-              backgroundColor: "rgba(255,255,255,0.25)",
+              backgroundColor: showSearch ? "rgba(255,255,255,0.25)" : 'transparent',
               borderWidth: 1,
               borderColor: "rgba(255,255,255,0.3)",
             }}
@@ -61,7 +61,7 @@ export default function Index() {
                 borderRadius: 9999,
                 margin: 4,
               }}
-              onPress={() => setShowSearch((v) => !v)}
+              onPress={() => setShowSearch(!showSearch)}
             >
               <Ionicons name="search" color="white" size={25} />
             </TouchableOpacity>
