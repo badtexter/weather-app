@@ -1,15 +1,12 @@
-import { Text, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { Image, Text, View } from "react-native";
 
 export default function Index() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+    <View className="flex-1 relative">
+      <StatusBar style="light" />
+      <Image source={require("../assets/images/bg.png")} className="absolute w-full h-full" />
+      <Text className="text-white text-2xl">Hello world</Text>
     </View>
   );
 }
