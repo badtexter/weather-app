@@ -32,6 +32,7 @@ export default function Index() {
               alignItems: "center",
               borderRadius: 9999,
               backgroundColor: "white",
+              opacity: 0.2,
             }}
           >
             <TextInput
@@ -53,6 +54,7 @@ export default function Index() {
                 padding: 12,
                 borderRadius: 9999,
                 margin: 4,
+                opacity: 0.3,
               }}
             >
             </TouchableOpacity>
