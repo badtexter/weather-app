@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function Index() {
+  const [showSearch, setShowSearch] = React.useState(false);
   return (
     <View style={{ flex: 1, position: "relative" }}>
       <StatusBar style="light" />
@@ -37,17 +38,20 @@ export default function Index() {
               borderColor: "rgba(255,255,255,0.3)",
             }}
           >
-            <TextInput
-              placeholder="Search city"
-              placeholderTextColor="rgba(255,255,255,0.7)"
-              style={{
-                paddingLeft: 24,
-                height: 40,
-                flex: 1,
-                fontSize: 16,
-                color: "white",
-              }}
-            />
+            {/* When search is shown */}
+            {showSearch ? (
+              <TextInput
+                placeholder="Search city"
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                style={{
+                  paddingLeft: 24,
+                  height: 40,
+                  flex: 1,
+                  fontSize: 16,
+                  color: "white",
+                }}
+              />
+            ) : null}
 
             {/* Search button */}
             <TouchableOpacity
@@ -57,7 +61,8 @@ export default function Index() {
                 borderRadius: 9999,
                 margin: 4,
               }}
-              >
+              onPress={() => setShowSearch((v) => !v)}
+            >
               <Ionicons name="search" color="white" size={25} />
             </TouchableOpacity>
           </View>
