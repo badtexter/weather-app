@@ -3,6 +3,8 @@ import React from "react";
 import { Image, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 export default function Index() {
   return (
     <View style={{ flex: 1, position: "relative" }}>
@@ -28,16 +30,16 @@ export default function Index() {
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "flex-end",
               alignItems: "center",
               borderRadius: 9999,
-              backgroundColor: "white",
-              opacity: 0.2,
+              backgroundColor: "rgba(255,255,255,0.25)",
+              borderWidth: 1,
+              borderColor: "rgba(255,255,255,0.3)",
             }}
           >
             <TextInput
               placeholder="Search city"
-              placeholderTextColor={"lightgray"}
+              placeholderTextColor="rgba(255,255,255,0.7)"
               style={{
                 paddingLeft: 24,
                 height: 40,
@@ -50,13 +52,13 @@ export default function Index() {
             {/* Search button */}
             <TouchableOpacity
               style={{
-                backgroundColor: "white",
+                backgroundColor: "rgba(255,255,255,0.4)",
                 padding: 12,
                 borderRadius: 9999,
                 margin: 4,
-                opacity: 0.3,
               }}
-            >
+              >
+              <Ionicons name="search" color="white" size={25} />
             </TouchableOpacity>
           </View>
         </View>
