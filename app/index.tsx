@@ -115,26 +115,9 @@ export default function Index() {
           }
         </View>
         {/* Weather section */}
-        <View style={{
-          marginHorizontal: 16,
-          flex: 1,
-          justifyContent: 'space-around',
-          marginBottom: 8
-        }}>
-          <Text style={{
-            color: 'white',
-            textAlign: 'center',
-            fontSize: 24,
-            fontWeight: 'bold'
-          }}>Kalisz,
-            <Text style={{
-              fontSize: 18,
-              fontWeight: '600',
-              color: '#d1d5db'
-            }}> Polska</Text>
-            <View className="flex-row justify-center">
-              <Image
-            </View>
+        <View className="mx-4 flex justify-around fkex-1 mb-2">
+          <Text className="text-white text-center text-2xl font-bold">Kalisz,
+            <Text className="text-lg font-semibold text-gray-300"> 20°</Text>
           </Text>
         </View>
       </SafeAreaView>
