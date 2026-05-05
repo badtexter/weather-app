@@ -117,7 +117,23 @@ export default function Index() {
         {/* Weather section */}
         <View className="mx-4 flex justify-around fkex-1 mb-2">
           <Text className="text-white text-center text-2xl font-bold">Kalisz,
-            <Text className="text-lg font-semibold text-gray-300"> 20°</Text>
+            <Text className="text-lg font-semibold text-gray-300"> 
+              Polska
+            </Text>
+          </Text>
+          {/* Weather icon */}
+          <Image
+            source={require("../assets/images/icons/sunny-day.png")}
+            className="w-52 h-52"
+          />
+        </View>
+        {/* Forecast section */}
+        <View className="space=y=2">
+          <Text className="text-center font-bold text-white text-6xl ml-5">
+            20°
+          </Text>
+          <Text className="text-center font-bold text-white text-xl ml-5">
+            Słonecznie
           </Text>
         </View>
       </SafeAreaView>
