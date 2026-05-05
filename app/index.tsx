@@ -115,26 +115,58 @@ export default function Index() {
           }
         </View>
         {/* Weather section */}
-        <View className="mx-4 flex justify-around fkex-1 mb-2">
-          <Text className="text-white text-center text-2xl font-bold">Kalisz,
-            <Text className="text-lg font-semibold text-gray-300"> 
+        <View style={{
+          marginHorizontal: 16,
+          flex: 1,
+          justifyContent: 'space-around',
+          marginBottom: 8,
+          alignItems: 'center'
+        }}>
+          <Text style={{
+            color: 'white',
+            textAlign: 'center',
+            fontSize: 24,
+            fontWeight: 'bold'
+          }}>Kalisz,
+            <Text style={{
+              fontSize: 18,
+              fontWeight: '600',
+              color: '#d1d5db'
+            }}> 
               Polska
             </Text>
           </Text>
           {/* Weather icon */}
           <Image
             source={require("../assets/images/icons/sunny-day.png")}
-            className="w-52 h-52"
+            style={{ width: 208, height: 208 }}
           />
-        </View>
-        {/* Forecast section */}
-        <View className="space=y=2">
-          <Text className="text-center font-bold text-white text-6xl ml-5">
-            20°
-          </Text>
-          <Text className="text-center font-bold text-white text-xl ml-5">
-            Słonecznie
-          </Text>
+          {/* Forecast section */}
+          <View style={{
+            width: '100%',
+            alignItems: 'center'
+          }}>
+            <Text style={{
+              textAlign: 'center',
+              fontWeight: 'bold',
+              color: 'white',
+              fontSize: 56,
+              marginLeft: 20
+            }}>
+              20°
+            </Text>
+            <Text style={{
+              textAlign: 'center',
+              color: 'white',
+              fontSize: 20,
+              letterSpacing: 2,
+              marginTop: 8
+            }}>
+              Słonecznie
+            </Text>
+          </View>
+          {/* Additional info */}
+
         </View>
       </SafeAreaView>
     </View>
