@@ -8,6 +8,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 export default function Index() {
   const [showSearch, setShowSearch] = React.useState(false);
   const [locations, setLocation] = React.useState([1,2,3]);
+  const handleLocation = (location: number) => {
+    console.log('location:', location);
+  };
   return (
     <View style={{ flex: 1, position: "relative" }}>
       <StatusBar style="light" />
@@ -76,7 +79,8 @@ export default function Index() {
                     const borderClass = shownBorder ? "border-b-2 border-b-gray-400" : "";
 
                     return (
-                      <TouchableOpacity key={index} className={`flex-row items-center border-0 p-3 px-4 mb-1 ${borderClass}`}>
+                      <TouchableOpacity key={index} className={`flex-row items-center border-0 p-3 px-4 mb-1 ${borderClass}`}
+                      onPress={()=> handleLocation(location)}>
                         <Ionicons name="location" color="gray" size={20} />
                         <Text className="text-black text-lg ml-2">meow</Text>
                       </TouchableOpacity>
