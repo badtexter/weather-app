@@ -166,7 +166,26 @@ export default function Index() {
             </Text>
           </View>
           {/* Additional info */}
-
+          <View className="flex-row justify-between mx-4">
+            <View className="fles-row space-x-2 items-center">
+              <Image source={require("../assets/images/icons/wind.png")} style={{ width: 6, height: 6 }} />
+              <Text className="text-white font-semibold text-base">
+                22km
+              </Text>
+            </View>
+            <View className="fles-row space-x-2 items-center">
+              <Image source={require("../assets/images/icons/humidity.png")} style={{ width: 6, height: 6 }} />
+              <Text className="text-white font-semibold text-base">
+                22%
+              </Text>
+            </View>
+            <View className="fles-row space-x-2 items-center">
+              <Image source={require("../assets/images/icons/humidity.png")} style={{ width: 6, height: 6 }} />
+              <Text className="text-white font-semibold text-base">
+                22%
+              </Text>
+            </View>
+          </View>
         </View>
       </SafeAreaView>
     </View>
