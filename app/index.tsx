@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Image, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -72,7 +72,8 @@ export default function Index() {
               <View className="absolute w-full bg-gray-300 top-16 rounded-3xl">
                 {
                   locations.map((location, index) => (
-                    <TouchableOpacity key={index}>
+                    <TouchableOpacity key={index} className="flex-row items-center border-0 p-3 px-4 mb-1 border-b-2 border-b-gray-400">
+                      <Ionicons name="location" color="gray" size={20} />
                       <Text>meow</Text>
                     </TouchableOpacity>
                   ))
