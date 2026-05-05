@@ -71,12 +71,17 @@ export default function Index() {
             locations.length > 0 && showSearch ? (
               <View className="absolute w-full bg-gray-300 top-16 rounded-3xl">
                 {
-                  locations.map((location, index) => (
-                    <TouchableOpacity key={index} className="flex-row items-center border-0 p-3 px-4 mb-1 border-b-2 border-b-gray-400">
-                      <Ionicons name="location" color="gray" size={20} />
-                      <Text>meow</Text>
-                    </TouchableOpacity>
-                  ))
+                  locations.map((location, index) => {
+                    const shownBorder = index + 1 !== locations.length;
+                    const borderClass = shownBorder ? "border-b-2 border-b-gray-400" : "";
+
+                    return (
+                      <TouchableOpacity key={index} className={`flex-row items-center border-0 p-3 px-4 mb-1 ${borderClass}`}>
+                        <Ionicons name="location" color="gray" size={20} />
+                        <Text className="text-black text-lg ml-2">meow</Text>
+                      </TouchableOpacity>
+                    );
+                  })
                 }
               </View>
             ) : null
