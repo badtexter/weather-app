@@ -59,7 +59,9 @@ npx expo start
 * Foggy icons created by apien – https://www.flaticon.com/free-icons/foggy
 * Wind icons created by Icon Mart - https://www.flaticon.com/free-icons/wind
 * Humidity icons created by Christ Design - https://www.flaticon.com/free-icons/humidity
-* Sunrise icons created by Icon Hubs - https://www.flaticon.com/free-icons/sunset"
+* Sunrise icons created by Icon Hubs - https://www.flaticon.com/free-icons/sunrise
+* Sunset icons created by Icon Hubs - https://www.flaticon.com/free-icons/sunset
+* Pole icons created by Defamiravi Studio - https://www.flaticon.com/free-icons/botanic
 
 ## Status
 
