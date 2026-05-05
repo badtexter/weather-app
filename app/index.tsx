@@ -131,7 +131,10 @@ export default function Index() {
               fontSize: 18,
               fontWeight: '600',
               color: '#d1d5db'
-            }}> 20°</Text>
+            }}> Polska</Text>
+            <View className="flex-row justify-center">
+              <Image
+            </View>
           </Text>
         </View>
       </SafeAreaView>
