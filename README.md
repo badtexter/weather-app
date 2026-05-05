@@ -57,6 +57,9 @@ npx expo start
 * Thunderstorm icons created by berkahicon – https://www.flaticon.com/free-icons/thunderstorm
 * Snow icons created by berkahicon – https://www.flaticon.com/free-icons/snow
 * Foggy icons created by apien – https://www.flaticon.com/free-icons/foggy
+* Wind icons created by Icon Mart - https://www.flaticon.com/free-icons/wind
+* Humidity icons created by Christ Design - https://www.flaticon.com/free-icons/humidity
+* Sunrise icons created by Icon Hubs - https://www.flaticon.com/free-icons/sunset"
 
 ## Status
 
