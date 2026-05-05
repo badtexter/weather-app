@@ -72,17 +72,40 @@ export default function Index() {
           </View>
           {
             locations.length > 0 && showSearch ? (
-              <View className="absolute w-full bg-gray-300 top-16 rounded-3xl">
+              <View style={{
+                position: 'absolute',
+                width: '100%',
+                backgroundColor: '#d1d5db',
+                top: 64,
+                borderRadius: 24
+              }}>
                 {
                   locations.map((location, index) => {
                     const shownBorder = index + 1 !== locations.length;
-                    const borderClass = shownBorder ? "border-b-2 border-b-gray-400" : "";
+                    const borderStyle = shownBorder ? {
+                      borderBottomWidth: 2,
+                      borderBottomColor: '#9ca3af'
+                    } : {};
 
                     return (
-                      <TouchableOpacity key={index} className={`flex-row items-center border-0 p-3 px-4 mb-1 ${borderClass}`}
-                      onPress={()=> handleLocation(location)}>
+                      <TouchableOpacity
+                        key={index}
+                        style={[{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          borderWidth: 0,
+                          padding: 12,
+                          paddingHorizontal: 16,
+                          marginBottom: 4
+                        }, borderStyle]}
+                        onPress={()=> handleLocation(location)}
+                      >
                         <Ionicons name="location" color="gray" size={20} />
-                        <Text className="text-black text-lg ml-2">meow</Text>
+                        <Text style={{
+                          color: 'black',
+                          fontSize: 18,
+                          marginLeft: 8
+                        }}>meow</Text>
                       </TouchableOpacity>
                     );
                   })
@@ -90,6 +113,26 @@ export default function Index() {
               </View>
             ) : null
           }
+        </View>
+        {/* Weather section */}
+        <View style={{
+          marginHorizontal: 16,
+          flex: 1,
+          justifyContent: 'space-around',
+          marginBottom: 8
+        }}>
+          <Text style={{
+            color: 'white',
+            textAlign: 'center',
+            fontSize: 24,
+            fontWeight: 'bold'
+          }}>Kalisz,
+            <Text style={{
+              fontSize: 18,
+              fontWeight: '600',
+              color: '#d1d5db'
+            }}> 20°</Text>
+          </Text>
         </View>
       </SafeAreaView>
     </View>
