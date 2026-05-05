@@ -166,27 +166,71 @@ export default function Index() {
             </Text>
           </View>
           {/* Additional info */}
-          <View className="flex-row justify-between mx-4">
-            <View className="fles-row space-x-2 items-center">
-              <Image source={require("../assets/images/icons/wind.png")} style={{ width: 6, height: 6 }} />
-              <Text className="text-white font-semibold text-base">
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: 16,
+            width: '100%'
+          }}>
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginRight: 8
+            }}>
+              <Image source={require("../assets/images/icons/wind.png")} style={{ width: 24, height: 24, marginRight: 8 }} />
+              <Text style={{
+                color: 'white',
+                fontWeight: '600',
+                fontSize: 16
+              }}>
                 22km
               </Text>
             </View>
-            <View className="fles-row space-x-2 items-center">
-              <Image source={require("../assets/images/icons/humidity.png")} style={{ width: 6, height: 6 }} />
-              <Text className="text-white font-semibold text-base">
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginRight: 8
+            }}>
+              <Image source={require("../assets/images/icons/humidity.png")} style={{ width: 24, height: 24, marginRight: 8 }} />
+              <Text style={{
+                color: 'white',
+                fontWeight: '600',
+                fontSize: 16
+              }}>
                 22%
               </Text>
             </View>
-            <View className="fles-row space-x-2 items-center">
-              <Image source={require("../assets/images/icons/humidity.png")} style={{ width: 6, height: 6 }} />
-              <Text className="text-white font-semibold text-base">
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center'
+            }}>
+              <Image source={require("../assets/images/icons/humidity.png")} style={{ width: 24, height: 24, marginRight: 8 }} />
+              <Text style={{
+                color: 'white',
+                fontWeight: '600',
+                fontSize: 16
+              }}>
                 22%
               </Text>
             </View>
           </View>
         </View>
+
+        {/* Forcast section for next days */}
+        <View style={{
+          marginBottom: 8,
+          paddingVertical: 12
+        }}>
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginHorizontal: 20,
+              marginBottom: 8
+            }}>
+              <Ionicons name="calendar" size={22} color="white" />
+            </View>
+        </View>
+
       </SafeAreaView>
     </View>
   );
