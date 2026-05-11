@@ -17,6 +17,7 @@ const { width } = Dimensions.get("window");
 const colors = {
   background: "#f8f8fa",
   card: "#ffffff",
+  search: "rgba(255,255,255,0.9)",
   text: {
     primary: "#111111",
     secondary: "#8e8e93",
@@ -51,10 +52,10 @@ const SearchBar = ({ onPress }: { onPress: () => void }) => (
       marginVertical: 12,
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: colors.card,
-      borderRadius: 12,
+      backgroundColor: colors.search,
+      borderRadius: 14,
       paddingHorizontal: 16,
-      height: 50,
+      height: 46,
       ...shadows.small,
     }}
   >
@@ -63,7 +64,7 @@ const SearchBar = ({ onPress }: { onPress: () => void }) => (
       style={{
         marginLeft: 12,
         flex: 1,
-        fontSize: 16,
+        fontSize: 15,
         color: colors.text.secondary,
       }}
     >
