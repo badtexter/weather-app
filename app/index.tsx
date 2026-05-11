@@ -298,7 +298,7 @@ export default function Index() {
                 fontSize: 16,
                 color: colors.text.secondary,
                 marginTop: 4,
-                letterSpacing: -0.8,
+                fontWeight: "400", 
               }}
             >
               Poland
@@ -367,10 +367,10 @@ export default function Index() {
           >
             <Text
               style={{
-                fontSize: 82,
+                fontSize: 88,
                 fontWeight: "100",
                 color: colors.text.primary,
-                letterSpacing: -4,
+                letterSpacing: -5,
                 lineHeight: 90,
               }}
             >
@@ -446,7 +446,7 @@ export default function Index() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 16 }}
+              contentContainerStyle={{ paddingHorizontal: 24, paddingRight: 40 }}
               scrollEventThrottle={16}
             >
               {forecast.map((day, index) => (
