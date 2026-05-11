@@ -1,354 +1,430 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import Ionicons from '@expo/vector-icons/Ionicons';
+const { width } = Dimensions.get("window");
+
+// Color palette
+const colors = {
+  background: "#f8f8fa",
+  card: "#ffffff",
+  text: {
+    primary: "#111111",
+    secondary: "#8e8e93",
+    tertiary: "#c7c7cc",
+  },
+  accent: "#0A84FF",
+  shadow: "#000000",
+};
+
+// Shadows
+const shadows = {
+  small: {
+    shadowColor: colors.shadow,
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  medium: {
+    shadowColor: colors.shadow,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+};
+
+// Search Bar Component
+const SearchBar = ({ onPress }: { onPress: () => void }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={{
+      marginHorizontal: 20,
+      marginVertical: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      height: 50,
+      ...shadows.small,
+    }}
+  >
+    <Ionicons name="search" size={20} color={colors.text.secondary} />
+    <Text
+      style={{
+        marginLeft: 12,
+        flex: 1,
+        fontSize: 16,
+        color: colors.text.secondary,
+      }}
+    >
+      Search city
+    </Text>
+  </TouchableOpacity>
+);
+
+// Location Dropdown Component
+const LocationDropdown = ({
+  locations,
+  onSelect,
+}: {
+  locations: string[];
+  onSelect: (location: string) => void;
+}) => (
+  <View
+    style={{
+      position: "absolute",
+      top: 72,
+      left: 20,
+      right: 20,
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      overflow: "hidden",
+      zIndex: 100,
+      ...shadows.medium,
+    }}
+  >
+    {locations.map((location: string, index: number) => (
+      <TouchableOpacity
+        key={index}
+        onPress={() => onSelect(location)}
+        activeOpacity={0.6}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingVertical: 14,
+          paddingHorizontal: 16,
+          borderBottomWidth: index < locations.length - 1 ? 1 : 0,
+          borderBottomColor: colors.text.tertiary,
+        }}
+      >
+        <Ionicons
+          name="location-outline"
+          size={20}
+          color={colors.text.secondary}
+        />
+        <Text
+          style={{
+            marginLeft: 12,
+            fontSize: 16,
+            color: colors.text.primary,
+            fontWeight: "500",
+          }}
+        >
+          {location}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+);
+
+// Weather Info Card Component
+const InfoCard = ({
+  icon,
+  label,
+  value,
+}: {
+  icon: string;
+  label: string;
+  value: string;
+}) => (
+  <View
+    style={{
+      backgroundColor: colors.card,
+      flex: 1,
+      paddingVertical: 16,
+      borderRadius: 16,
+      alignItems: "center",
+      marginHorizontal: 6,
+      ...shadows.small,
+    }}
+  >
+    <Ionicons name={icon as any} size={24} color={colors.accent} />
+    <Text
+      style={{
+        fontSize: 12,
+        color: colors.text.secondary,
+        marginTop: 8,
+      }}
+    >
+      {label}
+    </Text>
+    <Text
+      style={{
+        fontSize: 18,
+        fontWeight: "600",
+        color: colors.text.primary,
+        marginTop: 4,
+      }}
+    >
+      {value}
+    </Text>
+  </View>
+);
+
+// Forecast Card Component
+const ForecastCard = ({
+  day,
+  temperature,
+  high,
+  low,
+  icon,
+}: {
+  day: string;
+  temperature: number;
+  high: number;
+  low: number;
+  icon: string;
+}) => (
+  <View
+    style={{
+      width: width * 0.28,
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      paddingVertical: 16,
+      alignItems: "center",
+      marginRight: 12,
+      ...shadows.small,
+    }}
+  >
+    <Image
+      source={require("../assets/images/icons/clouds.png")}
+      style={{ width: 32, height: 32, marginBottom: 8 }}
+    />
+    <Text
+      style={{
+        fontSize: 14,
+        fontWeight: "600",
+        color: colors.text.primary,
+        marginBottom: 4,
+      }}
+    >
+      {day}
+    </Text>
+    <Text
+      style={{
+        fontSize: 18,
+        fontWeight: "700",
+        color: colors.accent,
+        marginBottom: 4,
+      }}
+    >
+      {temperature}°
+    </Text>
+    <Text
+      style={{
+        fontSize: 12,
+        color: colors.text.secondary,
+      }}
+    >
+      {low}°
+    </Text>
+  </View>
+);
 
 export default function Index() {
   const [showSearch, setShowSearch] = React.useState(false);
-  const [locations, setLocation] = React.useState([1,2,3]);
-  const handleLocation = (location: number) => {
-    console.log('location:', location);
+  const [selectedLocation, setSelectedLocation] = React.useState("Kalisz");
+
+  const locations = ["Warszawa", "Kraków", "Gdańsk", "Poznań", "Wrocław"];
+
+  const weatherInfo = [
+    { icon: "wind-outline", label: "Wind", value: "22 km/h" },
+    { icon: "water-outline", label: "Humidity", value: "45%" },
+    { icon: "eye-outline", label: "Visibility", value: "10 km" },
+  ];
+
+  const forecast = [
+    { day: "Mon", temperature: 20, high: 20, low: 15 },
+    { day: "Tue", temperature: 18, high: 18, low: 14 },
+    { day: "Wed", temperature: 22, high: 22, low: 16 },
+    { day: "Thu", temperature: 19, high: 19, low: 15 },
+    { day: "Fri", temperature: 21, high: 21, low: 16 },
+  ];
+
+  const handleLocationSelect = (location: string) => {
+    setSelectedLocation(location);
+    setShowSearch(false);
   };
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#f8f8fa" }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar style="dark" />
 
+      {/* Decorative background elements */}
       <View
         style={{
           position: "absolute",
           width: 300,
           height: 300,
-          borderRadius: 999,
+          borderRadius: 150,
           backgroundColor: "#FFD66B",
-          opacity: 0.2,
-          top: 150,
+          opacity: 0.1,
+          top: 100,
           alignSelf: "center",
-        }}
-      />
-
-      <Image
-        source={require("../assets/images/icons/sunny-day.png")}
-        blurRadius={30}
-        style={{
-          position: "absolute",
-          width: 250,
-          height: 250,
-          top: 140,
-          alignSelf: "center",
-          opacity: 0.08,
         }}
       />
 
       <SafeAreaView style={{ flex: 1 }}>
-        {/* Search section */}
-        <View
-          style={{
-            height: "7%",
-            marginHorizontal: 16,
-            position: "relative",
-            zIndex: 50,
-          }}
-        >
-          {/* Search section */}
-          <View
-            style={{
-              marginHorizontal: 20,
-              marginTop: 10,
-            }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: "#fff",
-                borderRadius: 16,
-                paddingHorizontal: 16,
-                height: 50,
-                shadowColor: "#000",
-                shadowOpacity: 0.05,
-                shadowRadius: 8,
-                elevation: 3,
-              }}>
-              <Ionicons name="search" size={20} color="#8e8e93" />
-
-              <TextInput
-                placeholder="Search city"
-                placeholderTextColor="#8e8e93"
-                style={{
-                  marginLeft: 10,
-                  flex: 1,
-                  fontSize: 16,
-                  color: "#111",
-                }}/>
-            </View>
-          </View>
-          {
-            locations.length > 0 && showSearch ? (
-              <View style={{
-                position: 'absolute',
-                width: '100%',
-                backgroundColor: '#d1d5db',
-                top: 64,
-                borderRadius: 24
-              }}>
-                {
-                  locations.map((location, index) => {
-                    const shownBorder = index + 1 !== locations.length;
-                    const borderStyle = shownBorder ? {
-                      borderBottomWidth: 2,
-                      borderBottomColor: '#9ca3af'
-                    } : {};
-
-                    return (
-                      <TouchableOpacity
-                        key={index}
-                        style={[{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          borderWidth: 0,
-                          padding: 12,
-                          paddingHorizontal: 16,
-                          marginBottom: 4
-                        }, borderStyle]}
-                        onPress={()=> handleLocation(location)}
-                      >
-                        <Ionicons name="location" color="gray" size={20} />
-                        <Text style={{
-                          color: 'black',
-                          fontSize: 18,
-                          marginLeft: 8
-                        }}>meow</Text>
-                      </TouchableOpacity>
-                    );
-                  })
-                }
-              </View>
-            ) : null
-          }
+        {/* Search Section */}
+        <View style={{ position: "relative", zIndex: 50 }}>
+          <SearchBar onPress={() => setShowSearch(!showSearch)} />
+          {showSearch && locations.length > 0 && (
+            <LocationDropdown
+              locations={locations}
+              onSelect={handleLocationSelect}
+            />
+          )}
         </View>
-        {/* Weather section */}
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+
+        {/* Current Weather Section */}
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingVertical: 20 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Location & Temperature */}
+          <View style={{ alignItems: "center", marginBottom: 24 }}>
             <Text
               style={{
-                fontSize: 34,
+                fontSize: 32,
                 fontWeight: "600",
-                color: "#111",
+                color: colors.text.primary,
               }}
             >
-              Kalisz
+              {selectedLocation}
             </Text>
-
             <Text
               style={{
                 fontSize: 16,
-                color: "#8e8e93",
+                color: colors.text.secondary,
                 marginTop: 4,
               }}
             >
-              Polska
+              Poland
             </Text>
+          </View>
 
-            <Image
-              source={require("../assets/images/icons/sunny-day.png")}
+          {/* Weather Icon with Edge Glow */}
+          <View style={{ alignItems: "center", marginBottom: 20 }}>
+            <View
               style={{
-                width: 140,
-                height: 140,
-                marginVertical: 20,
+                shadowColor: "#FFD66B",
+                shadowOpacity: 0.6,
+                shadowRadius: 2,
+                shadowOffset: { width: 0, height: 0 },
+                elevation: 5,
+                borderRadius: 80,
               }}
-            />
+            >
+              <Image
+                source={require("../assets/images/icons/sunny-day.png")}
+                style={{
+                  width: 160,
+                  height: 160,
+                  borderRadius: 80,
+                }}
+              />
+            </View>
+          </View>
 
+          {/* Temperature Display */}
+          <View style={{ alignItems: "center", marginBottom: 12 }}>
             <Text
               style={{
                 fontSize: 72,
                 fontWeight: "200",
-                color: "#111",
+                color: colors.text.primary,
               }}
             >
               20°
             </Text>
-
             <Text
               style={{
-                fontSize: 20,
-                color: "#8e8e93",
-                marginTop: 6,
+                fontSize: 18,
+                color: colors.text.secondary,
+                marginTop: 8,
+                fontWeight: "500",
               }}
             >
-              Słonecznie
+              Sunny
             </Text>
           </View>
 
-        {/* Forcast section for next days */}
-        <View style={{
-          marginBottom: 8,
-          paddingVertical: 12
-        }}>
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginHorizontal: 20,
-              marginBottom: 8
-            }}>
-              <Ionicons name="calendar" size={22} color="white" />
-              <Text style={{
-                color: 'white',
-                fontSize: 16,
-                marginLeft: 8
-              }}>Dzienna prognoza</Text>
-            </View>
-            <ScrollView horizontal contentContainerStyle={{
-              paddingHorizontal: 16
-            }} showsHorizontalScrollIndicator={false}>
-              <View style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 96,
-                borderRadius: 24,
-                paddingVertical: 12,
-                marginRight: 16,
-                backgroundColor: 'rgba(255,255,255,0.15)'
-              }}>
-                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
-                <Text style={{
-                  color: 'white',
-                  fontSize: 14
-                }}>Poniedziałek</Text>
-                <Text style={{
-                  color: 'white',
-                  fontSize: 18,
-                  fontWeight: '600'
-                }}>20°</Text>
-              </View>
-              <View style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 96,
-                borderRadius: 24,
-                paddingVertical: 12,
-                marginRight: 16,
-                backgroundColor: 'rgba(255,255,255,0.15)'
-              }}>
-                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
-                <Text style={{
-                  color: 'white',
-                  fontSize: 14
-                }}>Wtorek</Text>
-                <Text style={{
-                  color: 'white',
-                  fontSize: 18,
-                  fontWeight: '600'
-                }}>20°</Text>
-              </View>
-              <View style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 96,
-                borderRadius: 24,
-                paddingVertical: 12,
-                marginRight: 16,
-                backgroundColor: 'rgba(255,255,255,0.15)'
-              }}>
-                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
-                <Text style={{
-                  color: 'white',
-                  fontSize: 14
-                }}>Środa</Text>
-                <Text style={{
-                  color: 'white',
-                  fontSize: 18,
-                  fontWeight: '600'
-                }}>20°</Text>
-              </View>
-              <View style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 96,
-                borderRadius: 24,
-                paddingVertical: 12,
-                marginRight: 16,
-                backgroundColor: 'rgba(255,255,255,0.15)'
-              }}>
-                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
-                <Text style={{
-                  color: 'white',
-                  fontSize: 14
-                }}>Czwartek</Text>
-                <Text style={{
-                  color: 'white',
-                  fontSize: 18,
-                  fontWeight: '600'
-                }}>20°</Text>
-              </View>
-              <View style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 96,
-                borderRadius: 24,
-                paddingVertical: 12,
-                marginRight: 16,
-                backgroundColor: 'rgba(255,255,255,0.15)'
-              }}>
-                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
-                <Text style={{
-                  color: 'white',
-                  fontSize: 14
-                }}>Piątek</Text>
-                <Text style={{
-                  color: 'white',
-                  fontSize: 18,
-                  fontWeight: '600'
-                }}>20°</Text>
-              </View>
-              <View style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 96,
-                borderRadius: 24,
-                paddingVertical: 12,
-                marginRight: 16,
-                backgroundColor: 'rgba(255,255,255,0.15)'
-              }}>
-                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
-                <Text style={{
-                  color: 'white',
-                  fontSize: 14
-                }}>Sobota</Text>
-                <Text style={{
-                  color: 'white',
-                  fontSize: 18,
-                  fontWeight: '600'
-                }}>20°</Text>
-              </View>
-              <View style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 96,
-                borderRadius: 24,
-                paddingVertical: 12,
-                marginRight: 16,
-                backgroundColor: 'rgba(255,255,255,0.15)'
-              }}>
-                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
-                <Text style={{
-                  color: 'white',
-                  fontSize: 14
-                }}>Niedziela</Text>
-                <Text style={{
-                  color: 'white',
-                  fontSize: 18,
-                  fontWeight: '600'
-                }}>20°</Text>
-              </View>
-            </ScrollView>
-        </View>
+          {/* Weather Details Cards */}
+          <View
+            style={{
+              flexDirection: "row",
+              paddingHorizontal: 16,
+              marginVertical: 24,
+              gap: 8,
+            }}
+          >
+            {weatherInfo.map((info, index) => (
+              <InfoCard
+                key={index}
+                icon={info.icon}
+                label={info.label}
+                value={info.value}
+              />
+            ))}
+          </View>
 
+          {/* 5-Day Forecast Section */}
+          <View style={{ marginBottom: 24 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 20,
+                marginBottom: 12,
+              }}
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={22}
+                color={colors.accent}
+              />
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "600",
+                  color: colors.text.primary,
+                  marginLeft: 8,
+                }}
+              >
+                5-Day Forecast
+              </Text>
+            </View>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16 }}
+              scrollEventThrottle={16}
+            >
+              {forecast.map((day, index) => (
+                <ForecastCard
+                  key={index}
+                  day={day.day}
+                  temperature={day.temperature}
+                  high={day.high}
+                  low={day.low}
+                  icon="cloud-outline"
+                />
+              ))}
+            </ScrollView>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
