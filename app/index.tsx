@@ -285,8 +285,9 @@ export default function Index() {
           <View style={{ alignItems: "center", marginBottom: 24 }}>
             <Text
               style={{
-                fontSize: 32,
-                fontWeight: "600",
+                fontSize: 34,
+                fontWeight: "500",
+                letterSpacing: -0.8,
                 color: colors.text.primary,
               }}
             >
@@ -297,6 +298,7 @@ export default function Index() {
                 fontSize: 16,
                 color: colors.text.secondary,
                 marginTop: 4,
+                letterSpacing: -0.8,
               }}
             >
               Poland
