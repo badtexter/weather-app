@@ -263,19 +263,6 @@ export default function Index() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar style="dark" />
 
-      {/* Decorative background elements */}
-      <View
-        style={{
-          position: "absolute",
-          width: 300,
-          height: 300,
-          borderRadius: 150,
-          opacity: 0.1,
-          top: 100,
-          alignSelf: "center",
-        }}
-      />
-
       <SafeAreaView style={{ flex: 1 }}>
         {/* Search Section */}
         <View style={{ position: "relative", zIndex: 50 }}>
