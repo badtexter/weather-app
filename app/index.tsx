@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -228,7 +228,27 @@ export default function Index() {
               marginBottom: 8
             }}>
               <Ionicons name="calendar" size={22} color="white" />
+              <Text style={{
+                color: 'white',
+                fontSize: 16,
+                marginLeft: 8
+              }}>Dzienna prognoza</Text>
             </View>
+            <ScrollView horizontal contentContainerStyle={{
+              paddingHorizontal: 16
+            }} showsHorizontalScrollIndicator={false}>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 96,
+                borderRadius: 24,
+                paddingVertical: 12,
+                marginRight: 16,
+                backgroundColor: 'rgba(255,255,255,0.15)'
+              }}>
+                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
+              </View>
+            </ScrollView>
         </View>
 
       </SafeAreaView>
