@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
@@ -260,7 +261,10 @@ export default function Index() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <LinearGradient
+      colors={["#F3F0FF", "#FFFFFF", "#EAF6FF"]}
+      style={{ flex: 1 }}
+    >
       <StatusBar style="dark" />
 
       <SafeAreaView style={{ flex: 1 }}>
@@ -463,6 +467,6 @@ export default function Index() {
           </View>
         </ScrollView>
       </SafeAreaView>
-    </View>
+    </LinearGradient>
   );
 }
