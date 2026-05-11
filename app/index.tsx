@@ -314,27 +314,49 @@ export default function Index() {
             </Text>
           </View>
 
-          {/* Weather Icon with Edge Glow */}
-          <View style={{ alignItems: "center", marginBottom: 20 }}>
+          {/* Weather Icon */}
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 20,
+              position: "relative",
+              width: 200,
+              height: 200,
+            }}
+          >
+            {/* soft glow behind icon */}
             <View
               style={{
-                shadowColor: "#FFD66B",
-                shadowOpacity: 0.6,
-                shadowRadius: 2,
-                shadowOffset: { width: 0, height: 0 },
-                elevation: 5,
-                borderRadius: 80,
+                position: "absolute",
+                width: 140,
+                height: 140,
+                borderRadius: 70,
+                backgroundColor: "#FFD66B",
+                opacity: 0.25,
               }}
-            >
-              <Image
-                source={require("../assets/images/icons/sunny-day.png")}
-                style={{
-                  width: 160,
-                  height: 160,
-                  borderRadius: 80,
-                }}
-              />
-            </View>
+            />
+
+            {/* second blur layer for smoother glow */}
+            <View
+              style={{
+                position: "absolute",
+                width: 180,
+                height: 180,
+                borderRadius: 90,
+                backgroundColor: "#FFE9A8",
+                opacity: 0.15,
+              }}
+            />
+
+            <Image
+              source={require("../assets/images/icons/sunny-day.png")}
+              style={{
+                width: 160,
+                height: 160,
+              }}
+              resizeMode="contain"
+            />
           </View>
 
           {/* Temperature Display */}
