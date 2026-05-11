@@ -1,8 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useRef } from "react";
 import {
+  Animated,
   Dimensions,
   Image,
   ScrollView,
@@ -236,6 +237,10 @@ const ForecastCard = ({
 );
 
 export default function Index() {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.98)).current;
+  
   const [showSearch, setShowSearch] = React.useState(false);
   const [selectedLocation, setSelectedLocation] = React.useState("Kalisz");
 
