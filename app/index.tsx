@@ -367,22 +367,31 @@ export default function Index() {
           </View>
 
           {/* Temperature Display */}
-          <View style={{ alignItems: "center", marginBottom: 12 }}>
+          <View
+            style={{
+              alignItems: "center",
+              marginBottom: 20,
+            }}
+          >
             <Text
               style={{
-                fontSize: 72,
-                fontWeight: "200",
+                fontSize: 82,
+                fontWeight: "100",
                 color: colors.text.primary,
+                letterSpacing: -4,
+                lineHeight: 90,
               }}
             >
               20°
             </Text>
+
             <Text
               style={{
-                fontSize: 18,
+                fontSize: 17,
                 color: colors.text.secondary,
-                marginTop: 8,
-                fontWeight: "500",
+                marginTop: 2,
+                fontWeight: "400",
+                letterSpacing: -0.2,
               }}
             >
               Sunny
