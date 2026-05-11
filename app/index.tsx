@@ -267,7 +267,6 @@ export default function Index() {
           width: 300,
           height: 300,
           borderRadius: 150,
-          backgroundColor: "#FFD66B",
           opacity: 0.1,
           top: 100,
           alignSelf: "center",
@@ -317,46 +316,54 @@ export default function Index() {
           {/* Weather Icon */}
           <View
             style={{
+              width: "100%",
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 20,
-              position: "relative",
-              width: 200,
-              height: 200,
             }}
           >
-            {/* soft glow behind icon */}
             <View
               style={{
-                position: "absolute",
-                width: 140,
-                height: 140,
-                borderRadius: 70,
-                backgroundColor: "#FFD66B",
-                opacity: 0.25,
+                width: 200,
+                height: 200,
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
               }}
-            />
+            >
+              {/* outer glow */}
+              <View
+                style={{
+                  position: "absolute",
+                  width: 180,
+                  height: 180,
+                  borderRadius: 90,
+                  backgroundColor: "#FFE082",
+                  opacity: 0.18,
+                }}
+              />
 
-            {/* second blur layer for smoother glow */}
-            <View
-              style={{
-                position: "absolute",
-                width: 180,
-                height: 180,
-                borderRadius: 90,
-                backgroundColor: "#FFE9A8",
-                opacity: 0.15,
-              }}
-            />
+              {/* inner glow */}
+              <View
+                style={{
+                  position: "absolute",
+                  width: 130,
+                  height: 130,
+                  borderRadius: 65,
+                  backgroundColor: "#FFD54F",
+                  opacity: 0.25,
+                }}
+              />
 
-            <Image
-              source={require("../assets/images/icons/sunny-day.png")}
-              style={{
-                width: 160,
-                height: 160,
-              }}
-              resizeMode="contain"
-            />
+              <Image
+                source={require("../assets/images/icons/sunny-day.png")}
+                resizeMode="contain"
+                style={{
+                  width: 160,
+                  height: 160,
+                }}
+              />
+            </View>
           </View>
 
           {/* Temperature Display */}
