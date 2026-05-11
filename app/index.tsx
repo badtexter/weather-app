@@ -409,26 +409,32 @@ export default function Index() {
           </View>
 
           {/* 5-Day Forecast Section */}
-          <View style={{ marginBottom: 24 }}>
+          <View
+            style={{
+              marginBottom: 28,
+            }}
+          >
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                paddingHorizontal: 20,
-                marginBottom: 12,
+                paddingHorizontal: 24,
+                marginBottom: 16,
               }}
             >
               <Ionicons
                 name="calendar-outline"
-                size={22}
-                color={colors.accent}
+                size={18}
+                color="#8E8E93"
               />
+
               <Text
                 style={{
-                  fontSize: 18,
-                  fontWeight: "600",
+                  fontSize: 20,
+                  fontWeight: "500",
                   color: colors.text.primary,
-                  marginLeft: 8,
+                  marginLeft: 10,
+                  letterSpacing: -0.3,
                 }}
               >
                 5-Day Forecast
