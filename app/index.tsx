@@ -393,9 +393,10 @@ export default function Index() {
           <View
             style={{
               flexDirection: "row",
-              paddingHorizontal: 16,
-              marginVertical: 24,
-              gap: 8,
+              justifyContent: "space-between",
+              paddingHorizontal: 24,
+              marginTop: 28,
+              marginBottom: 36,
             }}
           >
             {weatherInfo.map((info, index) => (
