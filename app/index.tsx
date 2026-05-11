@@ -24,6 +24,7 @@ const colors = {
     tertiary: "#c7c7cc",
   },
   accent: "#0A84FF",
+  secondaryAccent: "#5c9ce6",
   shadow: "#000000",
 };
 
@@ -142,14 +143,15 @@ const InfoCard = ({
     style={{
       backgroundColor: colors.card,
       flex: 1,
-      paddingVertical: 16,
-      borderRadius: 16,
+      paddingVertical: 18,
+      borderRadius: 22,
       alignItems: "center",
-      marginHorizontal: 6,
+      marginHorizontal: 4,
+      minHeight: 110,
       ...shadows.small,
     }}
   >
-    <Ionicons name={icon as any} size={24} color={colors.accent} />
+    <Ionicons name={icon as any} size={20} color={colors.secondaryAccent} />
     <Text
       style={{
         fontSize: 12,
@@ -188,10 +190,10 @@ const ForecastCard = ({
 }) => (
   <View
     style={{
-      width: width * 0.28,
+      width: 88,
       backgroundColor: colors.card,
-      borderRadius: 16,
-      paddingVertical: 16,
+      borderRadius: 20,
+      paddingVertical: 18,
       alignItems: "center",
       marginRight: 12,
       ...shadows.small,
