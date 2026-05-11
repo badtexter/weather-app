@@ -12,13 +12,35 @@ export default function Index() {
     console.log('location:', location);
   };
   return (
-    <View style={{ flex: 1, position: "relative" }}>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: "#f8f8fa" }}>
+      <StatusBar style="dark" />
 
+      {/* glow background */}
+      <View
+        style={{
+          position: "absolute",
+          width: 300,
+          height: 300,
+          borderRadius: 999,
+          backgroundColor: "#FFD66B",
+          opacity: 0.2,
+          top: 150,
+          alignSelf: "center",
+        }}
+      />
+
+      {/* blurred icon in background */}
       <Image
-        blurRadius={150}
-        source={require("../assets/images/bg.png")}
-        style={{ position: "absolute", width: "100%", height: "100%" }}
+        source={require("../assets/images/icons/sunny-day.png")}
+        blurRadius={30}
+        style={{
+          position: "absolute",
+          width: 250,
+          height: 250,
+          top: 140,
+          alignSelf: "center",
+          opacity: 0.08,
+        }}
       />
 
       <SafeAreaView style={{ flex: 1 }}>
