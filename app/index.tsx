@@ -128,106 +128,62 @@ export default function Index() {
           }
         </View>
         {/* Weather section */}
-        <View style={{
-          marginHorizontal: 16,
-          flex: 1,
-          justifyContent: 'space-around',
-          marginBottom: 8,
-          alignItems: 'center'
-        }}>
-          <Text style={{
-            color: 'white',
-            textAlign: 'center',
-            fontSize: 24,
-            fontWeight: 'bold'
-          }}>Kalisz,
-            <Text style={{
-              fontSize: 18,
-              fontWeight: '600',
-              color: '#d1d5db'
-            }}> 
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 34,
+                fontWeight: "600",
+                color: "#111",
+              }}
+            >
+              Kalisz
+            </Text>
+
+            <Text
+              style={{
+                fontSize: 16,
+                color: "#8e8e93",
+                marginTop: 4,
+              }}
+            >
               Polska
             </Text>
-          </Text>
-          {/* Weather icon */}
-          <Image
-            source={require("../assets/images/icons/sunny-day.png")}
-            style={{ width: 208, height: 208 }}
-          />
-          {/* Forecast section */}
-          <View style={{
-            width: '100%',
-            alignItems: 'center'
-          }}>
-            <Text style={{
-              textAlign: 'center',
-              fontWeight: 'bold',
-              color: 'white',
-              fontSize: 56,
-              marginLeft: 20
-            }}>
+
+            <Image
+              source={require("../assets/images/icons/sunny-day.png")}
+              style={{
+                width: 140,
+                height: 140,
+                marginVertical: 20,
+              }}
+            />
+
+            <Text
+              style={{
+                fontSize: 72,
+                fontWeight: "200",
+                color: "#111",
+              }}
+            >
               20°
             </Text>
-            <Text style={{
-              textAlign: 'center',
-              color: 'white',
-              fontSize: 20,
-              letterSpacing: 2,
-              marginTop: 8
-            }}>
+
+            <Text
+              style={{
+                fontSize: 20,
+                color: "#8e8e93",
+                marginTop: 6,
+              }}
+            >
               Słonecznie
             </Text>
           </View>
-          {/* Additional info */}
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginHorizontal: 16,
-            width: '100%'
-          }}>
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginRight: 8
-            }}>
-              <Image source={require("../assets/images/icons/wind.png")} style={{ width: 24, height: 24, marginRight: 8 }} />
-              <Text style={{
-                color: 'white',
-                fontWeight: '600',
-                fontSize: 16
-              }}>
-                22km
-              </Text>
-            </View>
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginRight: 8
-            }}>
-              <Image source={require("../assets/images/icons/humidity.png")} style={{ width: 24, height: 24, marginRight: 8 }} />
-              <Text style={{
-                color: 'white',
-                fontWeight: '600',
-                fontSize: 16
-              }}>
-                22%
-              </Text>
-            </View>
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center'
-            }}>
-              <Image source={require("../assets/images/icons/humidity.png")} style={{ width: 24, height: 24, marginRight: 8 }} />
-              <Text style={{
-                color: 'white',
-                fontWeight: '600',
-                fontSize: 16
-              }}>
-                22%
-              </Text>
-            </View>
-          </View>
-        </View>
 
         {/* Forcast section for next days */}
         <View style={{
