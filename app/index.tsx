@@ -15,7 +15,6 @@ export default function Index() {
     <View style={{ flex: 1, backgroundColor: "#f8f8fa" }}>
       <StatusBar style="dark" />
 
-      {/* glow background */}
       <View
         style={{
           position: "absolute",
@@ -29,7 +28,6 @@ export default function Index() {
         }}
       />
 
-      {/* blurred icon in background */}
       <Image
         source={require("../assets/images/icons/sunny-day.png")}
         blurRadius={30}
@@ -53,44 +51,37 @@ export default function Index() {
             zIndex: 50,
           }}
         >
-          {/* Search input */}
+          {/* Search section */}
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              borderRadius: 9999,
-              backgroundColor: showSearch ? "rgba(255,255,255,0.25)" : 'transparent',
-              borderWidth: 1,
-              borderColor: "rgba(255,255,255,0.3)",
-            }}
-          >
-            {/* When search is shown */}
-            {showSearch ? (
+              marginHorizontal: 20,
+              marginTop: 10,
+            }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "#fff",
+                borderRadius: 16,
+                paddingHorizontal: 16,
+                height: 50,
+                shadowColor: "#000",
+                shadowOpacity: 0.05,
+                shadowRadius: 8,
+                elevation: 3,
+              }}>
+              <Ionicons name="search" size={20} color="#8e8e93" />
+
               <TextInput
                 placeholder="Search city"
-                placeholderTextColor="rgba(255,255,255,0.7)"
+                placeholderTextColor="#8e8e93"
                 style={{
-                  paddingLeft: 24,
-                  height: 40,
+                  marginLeft: 10,
                   flex: 1,
                   fontSize: 16,
-                  color: "white",
-                }}
-              />
-            ) : null}
-
-            {/* Search button */}
-            <TouchableOpacity
-              style={{
-                backgroundColor: "rgba(255,255,255,0.4)",
-                padding: 12,
-                borderRadius: 9999,
-                margin: 4,
-              }}
-              onPress={() => setShowSearch(!showSearch)}
-            >
-              <Ionicons name="search" color="white" size={25} />
-            </TouchableOpacity>
+                  color: "#111",
+                }}/>
+            </View>
           </View>
           {
             locations.length > 0 && showSearch ? (
