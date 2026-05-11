@@ -247,6 +247,135 @@ export default function Index() {
                 backgroundColor: 'rgba(255,255,255,0.15)'
               }}>
                 <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
+                <Text style={{
+                  color: 'white',
+                  fontSize: 14
+                }}>Poniedziałek</Text>
+                <Text style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontWeight: '600'
+                }}>20°</Text>
+              </View>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 96,
+                borderRadius: 24,
+                paddingVertical: 12,
+                marginRight: 16,
+                backgroundColor: 'rgba(255,255,255,0.15)'
+              }}>
+                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
+                <Text style={{
+                  color: 'white',
+                  fontSize: 14
+                }}>Wtorek</Text>
+                <Text style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontWeight: '600'
+                }}>20°</Text>
+              </View>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 96,
+                borderRadius: 24,
+                paddingVertical: 12,
+                marginRight: 16,
+                backgroundColor: 'rgba(255,255,255,0.15)'
+              }}>
+                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
+                <Text style={{
+                  color: 'white',
+                  fontSize: 14
+                }}>Środa</Text>
+                <Text style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontWeight: '600'
+                }}>20°</Text>
+              </View>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 96,
+                borderRadius: 24,
+                paddingVertical: 12,
+                marginRight: 16,
+                backgroundColor: 'rgba(255,255,255,0.15)'
+              }}>
+                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
+                <Text style={{
+                  color: 'white',
+                  fontSize: 14
+                }}>Czwartek</Text>
+                <Text style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontWeight: '600'
+                }}>20°</Text>
+              </View>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 96,
+                borderRadius: 24,
+                paddingVertical: 12,
+                marginRight: 16,
+                backgroundColor: 'rgba(255,255,255,0.15)'
+              }}>
+                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
+                <Text style={{
+                  color: 'white',
+                  fontSize: 14
+                }}>Piątek</Text>
+                <Text style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontWeight: '600'
+                }}>20°</Text>
+              </View>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 96,
+                borderRadius: 24,
+                paddingVertical: 12,
+                marginRight: 16,
+                backgroundColor: 'rgba(255,255,255,0.15)'
+              }}>
+                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
+                <Text style={{
+                  color: 'white',
+                  fontSize: 14
+                }}>Sobota</Text>
+                <Text style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontWeight: '600'
+                }}>20°</Text>
+              </View>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 96,
+                borderRadius: 24,
+                paddingVertical: 12,
+                marginRight: 16,
+                backgroundColor: 'rgba(255,255,255,0.15)'
+              }}>
+                <Image source={require("../assets/images/icons/clouds.png")} style={{ width: 32, height: 32 }} />
+                <Text style={{
+                  color: 'white',
+                  fontSize: 14
+                }}>Niedziela</Text>
+                <Text style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontWeight: '600'
+                }}>20°</Text>
               </View>
             </ScrollView>
         </View>
