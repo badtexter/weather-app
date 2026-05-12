@@ -1,50 +1,68 @@
-# Welcome to your Expo app 👋
+# 🌤️ SkyCheck – Weather App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+SkyCheck is a modern weather application built with **React Native** and **Expo**, focused on clean UI design and intuitive user experience.
 
-## Get started
+The app allows users to:
 
-1. Install dependencies
+* search for cities
+* check current weather conditions
+* view weekly forecasts
+* see additional weather details such as wind speed, humidity, and rain probability
 
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. Start the app
+* React Native
+* Expo
+* JavaScript
+* OpenWeather API
+* Figma (UI Design)
 
-   ```bash
-   npx expo start
-   ```
+## Features
 
-In the output, you'll find options to open the app in a
+* Current weather information
+* 7-day forecast
+* City search
+* Dynamic weather icons
+* Responsive mobile UI
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Installation
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Clone repository:
 
 ```bash
-npm run reset-project
+git clone https://github.com/badtexter/weatherapp.git
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Install dependencies:
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Run the app:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+# Weather Icons Credits
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+* Cloudy icons created by berkahicon – https://www.flaticon.com/free-icons/cloudy
+* Rainy icons created by berkahicon – https://www.flaticon.com/free-icons/rainy
+* Rain icons created by apien – https://www.flaticon.com/free-icons/rain
+* Cloudy icons created by Design View – https://www.flaticon.com/free-icons/cloudy
+* Sunny icons created by Md Tanvirul Haque – https://www.flaticon.com/free-icons/sunny
+* Thunderstorm icons created by berkahicon – https://www.flaticon.com/free-icons/thunderstorm
+* Snow icons created by berkahicon – https://www.flaticon.com/free-icons/snow
+* Foggy icons created by apien – https://www.flaticon.com/free-icons/foggy
+* Wind icons created by Icon Mart - https://www.flaticon.com/free-icons/wind
+* Humidity icons created by Christ Design - https://www.flaticon.com/free-icons/humidity
+* Sunrise icons created by Icon Hubs - https://www.flaticon.com/free-icons/sunrise
+* Sunset icons created by Icon Hubs - https://www.flaticon.com/free-icons/sunset
+* Pole icons created by Defamiravi Studio - https://www.flaticon.com/free-icons/botanic
+
+## Status
+
+Project in progress 🚀
