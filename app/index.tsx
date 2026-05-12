@@ -1,17 +1,19 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
   Image,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getAlerts, getCurrent, getForecast, getFuture, getLocations, getSports } from "../api/weather";
 
 const { width } = Dimensions.get("window");
 
@@ -47,9 +49,16 @@ const shadows = {
 };
 
 // Search Bar Component
-const SearchBar = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity
-    onPress={onPress}
+const SearchBar = ({
+  value,
+  onChangeText,
+  onFocus,
+}: {
+  value: string;
+  onChangeText: (text: string) => void;
+  onFocus: () => void;
+}) => (
+  <View
     style={{
       marginHorizontal: 20,
       marginVertical: 12,
@@ -63,17 +72,20 @@ const SearchBar = ({ onPress }: { onPress: () => void }) => (
     }}
   >
     <Ionicons name="search" size={20} color={colors.text.secondary} />
-    <Text
+    <TextInput
+      value={value}
+      onChangeText={onChangeText}
+      onFocus={onFocus}
+      placeholder="Search city"
+      placeholderTextColor={colors.text.secondary}
       style={{
         marginLeft: 12,
         flex: 1,
         fontSize: 15,
-        color: colors.text.secondary,
+        color: colors.text.primary,
       }}
-    >
-      Search city
-    </Text>
-  </TouchableOpacity>
+    />
+  </View>
 );
 
 // Location Dropdown Component
@@ -81,8 +93,8 @@ const LocationDropdown = ({
   locations,
   onSelect,
 }: {
-  locations: string[];
-  onSelect: (location: string) => void;
+  locations: Array<{ label: string; query: string }>;
+  onSelect: (location: { label: string; query: string }) => void;
 }) => (
   <View
     style={{
@@ -97,7 +109,7 @@ const LocationDropdown = ({
       ...shadows.medium,
     }}
   >
-    {locations.map((location: string, index: number) => (
+    {locations.map((location, index) => (
       <TouchableOpacity
         key={index}
         onPress={() => onSelect(location)}
@@ -124,7 +136,7 @@ const LocationDropdown = ({
             fontWeight: "500",
           }}
         >
-          {location}
+          {location.label}
         </Text>
       </TouchableOpacity>
     ))}
@@ -241,27 +253,167 @@ export default function Index() {
   const slideAnim = useRef(new Animated.Value(20)).current;
   const scaleAnim = useRef(new Animated.Value(0.98)).current;
   
-  const [showSearch, setShowSearch] = React.useState(false);
-  const [selectedLocation, setSelectedLocation] = React.useState("Kalisz");
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("Kalisz");
+  const [weatherData, setWeatherData] = useState<any | null>(null);
+  const [forecastData, setForecastData] = useState<any | null>(null);
+  const [sportsData, setSportsData] = useState<any | null>(null);
+  const [futureData, setFutureData] = useState<any | null>(null);
+  const [alertsData, setAlertsData] = useState<any | null>(null);
+  const [locationOptions, setLocationOptions] = useState<Array<{ label: string; query: string }>>([
+    { label: "Warszawa", query: "Warszawa" },
+    { label: "Kraków", query: "Kraków" },
+    { label: "Gdańsk", query: "Gdańsk" },
+    { label: "Poznań", query: "Poznań" },
+    { label: "Wrocław", query: "Wrocław" },
+  ]);
+  const [loading, setLoading] = useState(false);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const locations = ["Warszawa", "Kraków", "Gdańsk", "Poznań", "Wrocław"];
+  const getFutureDate = () => {
+    const future = new Date();
+    future.setDate(future.getDate() + 14);
+    return future.toISOString().split("T")[0];
+  };
+
+  const fetchWeather = async (location: string) => {
+    setLoading(true);
+    try {
+      const [currentResult, forecastResult, sportsResult, futureResult, alertsResult] = await Promise.allSettled([
+        getCurrent({ cityName: location, includeAqi: "yes" }),
+        getForecast({ cityName: location, days: 5, includeAqi: "yes", includeAlerts: "no" }),
+        getSports({ cityName: location }),
+        getFuture({ cityName: location, date: getFutureDate() }),
+        getAlerts({ cityName: location }),
+      ]);
+
+      if (currentResult.status === "fulfilled") {
+        setWeatherData(currentResult.value);
+      } else {
+        console.error("Current weather failed:", currentResult.reason);
+        setWeatherData(null);
+      }
+
+      if (forecastResult.status === "fulfilled") {
+        setForecastData(forecastResult.value);
+      } else {
+        console.error("Forecast failed:", forecastResult.reason);
+        setForecastData(null);
+      }
+
+      if (sportsResult.status === "fulfilled") {
+        setSportsData(sportsResult.value);
+      } else {
+        console.error("Sports fetch failed:", sportsResult.reason);
+        setSportsData(null);
+      }
+
+      if (futureResult.status === "fulfilled") {
+        setFutureData(futureResult.value);
+      } else {
+        console.error("Future fetch failed:", futureResult.reason);
+        setFutureData(null);
+      }
+
+      if (alertsResult.status === "fulfilled") {
+        setAlertsData(alertsResult.value);
+      } else {
+        console.error("Alerts fetch failed:", alertsResult.reason);
+        setAlertsData(null);
+      }
+    } catch (error) {
+      console.error("Weather fetch failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWeather(selectedLocation);
+  }, [selectedLocation]);
+
+  const fetchLocationSuggestions = async (query: string) => {
+    if (!query.trim()) {
+      setLocationOptions([
+        { label: "Warszawa", query: "Warszawa" },
+        { label: "Kraków", query: "Kraków" },
+        { label: "Gdańsk", query: "Gdańsk" },
+        { label: "Poznań", query: "Poznań" },
+        { label: "Wrocław", query: "Wrocław" },
+      ]);
+      return;
+    }
+
+    try {
+      const results = await getLocations({ cityName: query });
+      if (Array.isArray(results)) {
+        setLocationOptions(
+          results.map((item: any) => ({
+            label: [item.name, item.region, item.country].filter(Boolean).join(", "),
+            query: item.name,
+          }))
+        );
+      } else {
+        setLocationOptions([]);
+      }
+    } catch (error) {
+      console.error("Location search failed:", error);
+      setLocationOptions([]);
+    }
+  };
+
+  useEffect(() => {
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    searchTimeout.current = setTimeout(() => {
+      fetchLocationSuggestions(searchQuery);
+    }, 300);
+
+    return () => {
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current);
+      }
+    };
+  }, [searchQuery]);
 
   const weatherInfo = [
-    { icon: "wind-outline", label: "Wind", value: "22 km/h" },
-    { icon: "water-outline", label: "Humidity", value: "45%" },
-    { icon: "eye-outline", label: "Visibility", value: "10 km" },
+    {
+      icon: "speedometer-outline",
+      label: "Wind",
+      value: weatherData ? `${weatherData.current.wind_kph} km/h` : "–",
+    },
+    {
+      icon: "water-outline",
+      label: "Humidity",
+      value: weatherData ? `${weatherData.current.humidity}%` : "–",
+    },
+    {
+      icon: "eye-outline",
+      label: "Visibility",
+      value: weatherData ? `${weatherData.current.vis_km} km` : "–",
+    },
   ];
 
-  const forecast = [
-    { day: "Mon", temperature: 20, high: 20, low: 15 },
-    { day: "Tue", temperature: 18, high: 18, low: 14 },
-    { day: "Wed", temperature: 22, high: 22, low: 16 },
-    { day: "Thu", temperature: 19, high: 19, low: 15 },
-    { day: "Fri", temperature: 21, high: 21, low: 16 },
-  ];
+  const forecast: Array<{ day: string; temperature: number; high: number; low: number }> =
+    forecastData?.forecast?.forecastday?.map((day: any) => ({
+      day: new Date(day.date).toLocaleDateString("en-US", { weekday: "short" }),
+      temperature: Math.round(day.day.avgtemp_c),
+      high: Math.round(day.day.maxtemp_c),
+      low: Math.round(day.day.mintemp_c),
+    })) || [
+      { day: "Mon", temperature: 20, high: 20, low: 15 },
+      { day: "Tue", temperature: 18, high: 18, low: 14 },
+      { day: "Wed", temperature: 22, high: 22, low: 16 },
+      { day: "Thu", temperature: 19, high: 19, low: 15 },
+      { day: "Fri", temperature: 21, high: 21, low: 16 },
+    ];
 
-  const handleLocationSelect = (location: string) => {
-    setSelectedLocation(location);
+  const handleLocationSelect = (location: { label: string; query: string }) => {
+    setSelectedLocation(location.query);
+    setSearchQuery(location.label);
     setShowSearch(false);
   };
 
@@ -277,10 +429,14 @@ export default function Index() {
       <SafeAreaView style={{ flex: 1 }}>
         {/* Search Section */}
         <View style={{ position: "relative", zIndex: 50 }}>
-          <SearchBar onPress={() => setShowSearch(!showSearch)} />
-          {showSearch && locations.length > 0 && (
+          <SearchBar
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
+            onFocus={() => setShowSearch(true)}
+          />
+          {showSearch && locationOptions.length > 0 && (
             <LocationDropdown
-              locations={locations}
+              locations={locationOptions}
               onSelect={handleLocationSelect}
             />
           )}
@@ -385,7 +541,7 @@ export default function Index() {
                 lineHeight: 90,
               }}
             >
-              20°
+              {weatherData ? `${Math.round(weatherData.current.temp_c)}°` : "--°"}
             </Text>
 
             <Text
@@ -397,7 +553,7 @@ export default function Index() {
                 letterSpacing: -0.2,
               }}
             >
-              Sunny
+              {weatherData ? weatherData.current.condition.text : loading ? "Loading..." : "No data"}
             </Text>
           </View>
 
@@ -408,7 +564,7 @@ export default function Index() {
               justifyContent: "space-between",
               paddingHorizontal: 24,
               marginTop: 28,
-              marginBottom: 36,
+              marginBottom: 24,
             }}
           >
             {weatherInfo.map((info, index) => (
@@ -419,6 +575,72 @@ export default function Index() {
                 value={info.value}
               />
             ))}
+          </View>
+
+          {/* Extra Endpoint Cards */}
+          <View
+            style={{
+              marginBottom: 28,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 24,
+                marginBottom: 16,
+              }}
+            >
+              <Ionicons name="apps-outline" size={18} color="#8E8E93" />
+
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "500",
+                  color: colors.text.primary,
+                  marginLeft: 10,
+                  letterSpacing: -0.3,
+                }}
+              >
+                Extra endpoints
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingHorizontal: 24,
+              }}
+            >
+              <InfoCard
+                icon="trophy-outline"
+                label="Sports"
+                value={
+                  sportsData
+                    ? sportsData.sports?.[0]?.name || "Available"
+                    : "–"
+                }
+              />
+              <InfoCard
+                icon="calendar-outline"
+                label="Future"
+                value={
+                  futureData && futureData.forecast?.forecastday?.[0]
+                    ? `${Math.round(futureData.forecast.forecastday[0].day.avgtemp_c)}°`
+                    : "–"
+                }
+              />
+              <InfoCard
+                icon="alert-circle-outline"
+                label="Alerts"
+                value={
+                  alertsData?.alerts?.alert?.[0]?.headline
+                    ? alertsData.alerts.alert[0].headline
+                    : "No alerts"
+                }
+              />
+            </View>
           </View>
 
           {/* 5-Day Forecast Section */}
