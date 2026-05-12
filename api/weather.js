@@ -6,6 +6,7 @@ const CURRENT_ENDPOINT = params => `https://api.weatherapi.com/v1/current.json?k
 const LOCATIONS_ENDPOINT = params => `https://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${params.cityName}`;
 const SPORTS_ENDPOINT = params => `https://api.weatherapi.com/v1/sports.json?key=${API_KEY}&q=${params.cityName}`;
 const FUTURE_ENDPOINT = params => `https://api.weatherapi.com/v1/future.json?key=${API_KEY}&q=${params.cityName}&dt=${params.date}`;
+const ALERTS_ENDPOINT = params => `https://api.weatherapi.com/v1/alerts.json?key=${API_KEY}&q=${params.cityName}`;
 
 const callAPI = async (endpoint) => {
     const options = {
@@ -44,4 +45,9 @@ export const getSports = async (params) => {
 export const getFuture = async (params) => {
     let futureURL = FUTURE_ENDPOINT(params);
     return await callAPI(futureURL);
+}
+
+export const getAlerts = async (params) => {
+    let alertsURL = ALERTS_ENDPOINT(params);
+    return await callAPI(alertsURL);
 }
