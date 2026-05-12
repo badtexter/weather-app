@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getCurrent, getForecast } from "../api/weather";
 
 const { width } = Dimensions.get("window");
 
@@ -241,24 +242,66 @@ export default function Index() {
   const slideAnim = useRef(new Animated.Value(20)).current;
   const scaleAnim = useRef(new Animated.Value(0.98)).current;
   
-  const [showSearch, setShowSearch] = React.useState(false);
-  const [selectedLocation, setSelectedLocation] = React.useState("Kalisz");
+  const [showSearch, setShowSearch] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState("Kalisz");
+  const [weatherData, setWeatherData] = useState<any | null>(null);
+  const [forecastData, setForecastData] = useState<any | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const locations = ["Warszawa", "Kraków", "Gdańsk", "Poznań", "Wrocław"];
 
+  const fetchWeather = async (location: string) => {
+    setLoading(true);
+    try {
+      const [current, forecastResult] = await Promise.all([
+        getCurrent({ cityName: location, includeAqi: "yes" }),
+        getForecast({ cityName: location, days: 5, includeAqi: "yes", includeAlerts: "no" }),
+      ]);
+
+      setWeatherData(current);
+      setForecastData(forecastResult);
+    } catch (error) {
+      console.error("Weather fetch failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWeather(selectedLocation);
+  }, [selectedLocation]);
+
   const weatherInfo = [
-    { icon: "wind-outline", label: "Wind", value: "22 km/h" },
-    { icon: "water-outline", label: "Humidity", value: "45%" },
-    { icon: "eye-outline", label: "Visibility", value: "10 km" },
+    {
+      icon: "wind-outline",
+      label: "Wind",
+      value: weatherData ? `${weatherData.current.wind_kph} km/h` : "–",
+    },
+    {
+      icon: "water-outline",
+      label: "Humidity",
+      value: weatherData ? `${weatherData.current.humidity}%` : "–",
+    },
+    {
+      icon: "eye-outline",
+      label: "Visibility",
+      value: weatherData ? `${weatherData.current.vis_km} km` : "–",
+    },
   ];
 
-  const forecast = [
-    { day: "Mon", temperature: 20, high: 20, low: 15 },
-    { day: "Tue", temperature: 18, high: 18, low: 14 },
-    { day: "Wed", temperature: 22, high: 22, low: 16 },
-    { day: "Thu", temperature: 19, high: 19, low: 15 },
-    { day: "Fri", temperature: 21, high: 21, low: 16 },
-  ];
+  const forecast: Array<{ day: string; temperature: number; high: number; low: number }> =
+    forecastData?.forecast?.forecastday?.map((day: any) => ({
+      day: new Date(day.date).toLocaleDateString("en-US", { weekday: "short" }),
+      temperature: Math.round(day.day.avgtemp_c),
+      high: Math.round(day.day.maxtemp_c),
+      low: Math.round(day.day.mintemp_c),
+    })) || [
+      { day: "Mon", temperature: 20, high: 20, low: 15 },
+      { day: "Tue", temperature: 18, high: 18, low: 14 },
+      { day: "Wed", temperature: 22, high: 22, low: 16 },
+      { day: "Thu", temperature: 19, high: 19, low: 15 },
+      { day: "Fri", temperature: 21, high: 21, low: 16 },
+    ];
 
   const handleLocationSelect = (location: string) => {
     setSelectedLocation(location);
@@ -385,7 +428,7 @@ export default function Index() {
                 lineHeight: 90,
               }}
             >
-              20°
+              {weatherData ? `${Math.round(weatherData.current.temp_c)}°` : "--°"}
             </Text>
 
             <Text
@@ -397,7 +440,7 @@ export default function Index() {
                 letterSpacing: -0.2,
               }}
             >
-              Sunny
+              {weatherData ? weatherData.current.condition.text : loading ? "Loading..." : "No data"}
             </Text>
           </View>
 
