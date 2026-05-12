@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getCurrent, getForecast, getLocations } from "../api/weather";
+import { getAlerts, getCurrent, getForecast, getFuture, getLocations, getSports } from "../api/weather";
 
 const { width } = Dimensions.get("window");
 
@@ -258,6 +258,9 @@ export default function Index() {
   const [selectedLocation, setSelectedLocation] = useState("Kalisz");
   const [weatherData, setWeatherData] = useState<any | null>(null);
   const [forecastData, setForecastData] = useState<any | null>(null);
+  const [sportsData, setSportsData] = useState<any | null>(null);
+  const [futureData, setFutureData] = useState<any | null>(null);
+  const [alertsData, setAlertsData] = useState<any | null>(null);
   const [locationOptions, setLocationOptions] = useState<Array<{ label: string; query: string }>>([
     { label: "Warszawa", query: "Warszawa" },
     { label: "Kraków", query: "Kraków" },
@@ -268,16 +271,57 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const getFutureDate = () => {
+    const future = new Date();
+    future.setDate(future.getDate() + 14);
+    return future.toISOString().split("T")[0];
+  };
+
   const fetchWeather = async (location: string) => {
     setLoading(true);
     try {
-      const [current, forecastResult] = await Promise.all([
+      const [currentResult, forecastResult, sportsResult, futureResult, alertsResult] = await Promise.allSettled([
         getCurrent({ cityName: location, includeAqi: "yes" }),
         getForecast({ cityName: location, days: 5, includeAqi: "yes", includeAlerts: "no" }),
+        getSports({ cityName: location }),
+        getFuture({ cityName: location, date: getFutureDate() }),
+        getAlerts({ cityName: location }),
       ]);
 
-      setWeatherData(current);
-      setForecastData(forecastResult);
+      if (currentResult.status === "fulfilled") {
+        setWeatherData(currentResult.value);
+      } else {
+        console.error("Current weather failed:", currentResult.reason);
+        setWeatherData(null);
+      }
+
+      if (forecastResult.status === "fulfilled") {
+        setForecastData(forecastResult.value);
+      } else {
+        console.error("Forecast failed:", forecastResult.reason);
+        setForecastData(null);
+      }
+
+      if (sportsResult.status === "fulfilled") {
+        setSportsData(sportsResult.value);
+      } else {
+        console.error("Sports fetch failed:", sportsResult.reason);
+        setSportsData(null);
+      }
+
+      if (futureResult.status === "fulfilled") {
+        setFutureData(futureResult.value);
+      } else {
+        console.error("Future fetch failed:", futureResult.reason);
+        setFutureData(null);
+      }
+
+      if (alertsResult.status === "fulfilled") {
+        setAlertsData(alertsResult.value);
+      } else {
+        console.error("Alerts fetch failed:", alertsResult.reason);
+        setAlertsData(null);
+      }
     } catch (error) {
       console.error("Weather fetch failed:", error);
     } finally {
@@ -337,7 +381,7 @@ export default function Index() {
 
   const weatherInfo = [
     {
-      icon: "wind-outline",
+      icon: "speedometer-outline",
       label: "Wind",
       value: weatherData ? `${weatherData.current.wind_kph} km/h` : "–",
     },
@@ -520,7 +564,7 @@ export default function Index() {
               justifyContent: "space-between",
               paddingHorizontal: 24,
               marginTop: 28,
-              marginBottom: 36,
+              marginBottom: 24,
             }}
           >
             {weatherInfo.map((info, index) => (
@@ -531,6 +575,72 @@ export default function Index() {
                 value={info.value}
               />
             ))}
+          </View>
+
+          {/* Extra Endpoint Cards */}
+          <View
+            style={{
+              marginBottom: 28,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 24,
+                marginBottom: 16,
+              }}
+            >
+              <Ionicons name="apps-outline" size={18} color="#8E8E93" />
+
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "500",
+                  color: colors.text.primary,
+                  marginLeft: 10,
+                  letterSpacing: -0.3,
+                }}
+              >
+                Extra endpoints
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                paddingHorizontal: 24,
+              }}
+            >
+              <InfoCard
+                icon="trophy-outline"
+                label="Sports"
+                value={
+                  sportsData
+                    ? sportsData.sports?.[0]?.name || "Available"
+                    : "–"
+                }
+              />
+              <InfoCard
+                icon="calendar-outline"
+                label="Future"
+                value={
+                  futureData && futureData.forecast?.forecastday?.[0]
+                    ? `${Math.round(futureData.forecast.forecastday[0].day.avgtemp_c)}°`
+                    : "–"
+                }
+              />
+              <InfoCard
+                icon="alert-circle-outline"
+                label="Alerts"
+                value={
+                  alertsData?.alerts?.alert?.[0]?.headline
+                    ? alertsData.alerts.alert[0].headline
+                    : "No alerts"
+                }
+              />
+            </View>
           </View>
 
           {/* 5-Day Forecast Section */}
