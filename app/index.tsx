@@ -93,8 +93,8 @@ const LocationDropdown = ({
   locations,
   onSelect,
 }: {
-  locations: string[];
-  onSelect: (location: string) => void;
+  locations: Array<{ label: string; query: string }>;
+  onSelect: (location: { label: string; query: string }) => void;
 }) => (
   <View
     style={{
@@ -109,7 +109,7 @@ const LocationDropdown = ({
       ...shadows.medium,
     }}
   >
-    {locations.map((location: string, index: number) => (
+    {locations.map((location, index) => (
       <TouchableOpacity
         key={index}
         onPress={() => onSelect(location)}
@@ -136,7 +136,7 @@ const LocationDropdown = ({
             fontWeight: "500",
           }}
         >
-          {location}
+          {location.label}
         </Text>
       </TouchableOpacity>
     ))}
@@ -258,12 +258,12 @@ export default function Index() {
   const [selectedLocation, setSelectedLocation] = useState("Kalisz");
   const [weatherData, setWeatherData] = useState<any | null>(null);
   const [forecastData, setForecastData] = useState<any | null>(null);
-  const [locationOptions, setLocationOptions] = useState<string[]>([
-    "Warszawa",
-    "Kraków",
-    "Gdańsk",
-    "Poznań",
-    "Wrocław",
+  const [locationOptions, setLocationOptions] = useState<Array<{ label: string; query: string }>>([
+    { label: "Warszawa", query: "Warszawa" },
+    { label: "Kraków", query: "Kraków" },
+    { label: "Gdańsk", query: "Gdańsk" },
+    { label: "Poznań", query: "Poznań" },
+    { label: "Wrocław", query: "Wrocław" },
   ]);
   const [loading, setLoading] = useState(false);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -292,11 +292,11 @@ export default function Index() {
   const fetchLocationSuggestions = async (query: string) => {
     if (!query.trim()) {
       setLocationOptions([
-        "Warszawa",
-        "Kraków",
-        "Gdańsk",
-        "Poznań",
-        "Wrocław",
+        { label: "Warszawa", query: "Warszawa" },
+        { label: "Kraków", query: "Kraków" },
+        { label: "Gdańsk", query: "Gdańsk" },
+        { label: "Poznań", query: "Poznań" },
+        { label: "Wrocław", query: "Wrocław" },
       ]);
       return;
     }
@@ -305,11 +305,10 @@ export default function Index() {
       const results = await getLocations({ cityName: query });
       if (Array.isArray(results)) {
         setLocationOptions(
-          results.map((item: any) =>
-            [item.name, item.region, item.country]
-              .filter(Boolean)
-              .join(", ")
-          )
+          results.map((item: any) => ({
+            label: [item.name, item.region, item.country].filter(Boolean).join(", "),
+            query: item.name,
+          }))
         );
       } else {
         setLocationOptions([]);
@@ -368,9 +367,9 @@ export default function Index() {
       { day: "Fri", temperature: 21, high: 21, low: 16 },
     ];
 
-  const handleLocationSelect = (location: string) => {
-    setSelectedLocation(location);
-    setSearchQuery(location);
+  const handleLocationSelect = (location: { label: string; query: string }) => {
+    setSelectedLocation(location.query);
+    setSearchQuery(location.label);
     setShowSearch(false);
   };
 
