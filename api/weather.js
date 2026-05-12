@@ -1,11 +1,13 @@
 import { API_KEY } from './secret';
 
-const FORECAST_ENDPOINT = params => `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${params.cityName}&days=${params.days}&aqi=${params.includeAqi}&alerts=${params.includeAlerts}`;
-const CURRENT_ENDPOINT = params => `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${params.cityName}&aqi=${params.includeAqi}`;
-const LOCATIONS_ENDPOINT = params => `https://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${params.cityName}`;
-const SPORTS_ENDPOINT = params => `https://api.weatherapi.com/v1/sports.json?key=${API_KEY}&q=${params.cityName}`;
-const FUTURE_ENDPOINT = params => `https://api.weatherapi.com/v1/future.json?key=${API_KEY}&q=${params.cityName}&dt=${params.date}`;
-const ALERTS_ENDPOINT = params => `https://api.weatherapi.com/v1/alerts.json?key=${API_KEY}&q=${params.cityName}`;
+const encode = value => encodeURIComponent(value || "");
+
+const FORECAST_ENDPOINT = params => `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${encode(params.cityName)}&days=${params.days}&aqi=${params.includeAqi}&alerts=${params.includeAlerts}`;
+const CURRENT_ENDPOINT = params => `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${encode(params.cityName)}&aqi=${params.includeAqi}`;
+const LOCATIONS_ENDPOINT = params => `https://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${encode(params.cityName)}`;
+const SPORTS_ENDPOINT = params => `https://api.weatherapi.com/v1/sports.json?key=${API_KEY}&q=${encode(params.cityName)}`;
+const FUTURE_ENDPOINT = params => `https://api.weatherapi.com/v1/future.json?key=${API_KEY}&q=${encode(params.cityName)}&dt=${encode(params.date)}`;
+const ALERTS_ENDPOINT = params => `https://api.weatherapi.com/v1/alerts.json?key=${API_KEY}&q=${encode(params.cityName)}`;
 
 const callAPI = async (endpoint) => {
     try {
