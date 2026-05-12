@@ -25,3 +25,23 @@ export const getForecast = async (params) => {
     let forecastURL = FORECAST_ENDPOINT(params);
     return await callAPI(forecastURL);
 }
+
+export const getCurrent = async (params) => {
+    let currentURL = CURRENT_ENDPOINT(params);
+    return await callAPI(currentURL);
+}
+
+export const getLocations = async (params) => {
+    let locationsURL = LOCATIONS_ENDPOINT(params);
+    return await callAPI(locationsURL);
+}
+
+export const getSports = async (params) => {
+    let sportsURL = SPORTS_ENDPOINT(params);
+    return await callAPI(sportsURL);
+}
+
+export const getFuture = async (params) => {
+    let futureURL = FUTURE_ENDPOINT(params);
+    return await callAPI(futureURL);
+}
