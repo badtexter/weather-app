@@ -8,11 +8,12 @@ import {
   Image,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getCurrent, getForecast } from "../api/weather";
+import { getCurrent, getForecast, getLocations } from "../api/weather";
 
 const { width } = Dimensions.get("window");
 
@@ -48,9 +49,16 @@ const shadows = {
 };
 
 // Search Bar Component
-const SearchBar = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity
-    onPress={onPress}
+const SearchBar = ({
+  value,
+  onChangeText,
+  onFocus,
+}: {
+  value: string;
+  onChangeText: (text: string) => void;
+  onFocus: () => void;
+}) => (
+  <View
     style={{
       marginHorizontal: 20,
       marginVertical: 12,
@@ -64,17 +72,20 @@ const SearchBar = ({ onPress }: { onPress: () => void }) => (
     }}
   >
     <Ionicons name="search" size={20} color={colors.text.secondary} />
-    <Text
+    <TextInput
+      value={value}
+      onChangeText={onChangeText}
+      onFocus={onFocus}
+      placeholder="Search city"
+      placeholderTextColor={colors.text.secondary}
       style={{
         marginLeft: 12,
         flex: 1,
         fontSize: 15,
-        color: colors.text.secondary,
+        color: colors.text.primary,
       }}
-    >
-      Search city
-    </Text>
-  </TouchableOpacity>
+    />
+  </View>
 );
 
 // Location Dropdown Component
@@ -243,12 +254,19 @@ export default function Index() {
   const scaleAnim = useRef(new Animated.Value(0.98)).current;
   
   const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Kalisz");
   const [weatherData, setWeatherData] = useState<any | null>(null);
   const [forecastData, setForecastData] = useState<any | null>(null);
+  const [locationOptions, setLocationOptions] = useState<string[]>([
+    "Warszawa",
+    "Kraków",
+    "Gdańsk",
+    "Poznań",
+    "Wrocław",
+  ]);
   const [loading, setLoading] = useState(false);
-
-  const locations = ["Warszawa", "Kraków", "Gdańsk", "Poznań", "Wrocław"];
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchWeather = async (location: string) => {
     setLoading(true);
@@ -270,6 +288,53 @@ export default function Index() {
   useEffect(() => {
     fetchWeather(selectedLocation);
   }, [selectedLocation]);
+
+  const fetchLocationSuggestions = async (query: string) => {
+    if (!query.trim()) {
+      setLocationOptions([
+        "Warszawa",
+        "Kraków",
+        "Gdańsk",
+        "Poznań",
+        "Wrocław",
+      ]);
+      return;
+    }
+
+    try {
+      const results = await getLocations({ cityName: query });
+      if (Array.isArray(results)) {
+        setLocationOptions(
+          results.map((item: any) =>
+            [item.name, item.region, item.country]
+              .filter(Boolean)
+              .join(", ")
+          )
+        );
+      } else {
+        setLocationOptions([]);
+      }
+    } catch (error) {
+      console.error("Location search failed:", error);
+      setLocationOptions([]);
+    }
+  };
+
+  useEffect(() => {
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    searchTimeout.current = setTimeout(() => {
+      fetchLocationSuggestions(searchQuery);
+    }, 300);
+
+    return () => {
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current);
+      }
+    };
+  }, [searchQuery]);
 
   const weatherInfo = [
     {
@@ -305,6 +370,7 @@ export default function Index() {
 
   const handleLocationSelect = (location: string) => {
     setSelectedLocation(location);
+    setSearchQuery(location);
     setShowSearch(false);
   };
 
@@ -320,10 +386,14 @@ export default function Index() {
       <SafeAreaView style={{ flex: 1 }}>
         {/* Search Section */}
         <View style={{ position: "relative", zIndex: 50 }}>
-          <SearchBar onPress={() => setShowSearch(!showSearch)} />
-          {showSearch && locations.length > 0 && (
+          <SearchBar
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
+            onFocus={() => setShowSearch(true)}
+          />
+          {showSearch && locationOptions.length > 0 && (
             <LocationDropdown
-              locations={locations}
+              locations={locationOptions}
               onSelect={handleLocationSelect}
             />
           )}
