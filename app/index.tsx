@@ -452,7 +452,7 @@ export default function Index() {
       high: Math.round(day.day.maxtemp_c),
       low: Math.round(day.day.mintemp_c),
       icon: getWeatherConfig(day.day.condition.text).icon,
-    }))
+    })) || [];
 
   const handleLocationSelect = (location: { label: string; query: string }) => {
     setSelectedLocation(location.query);
