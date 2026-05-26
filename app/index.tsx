@@ -256,7 +256,7 @@ const ForecastCard = ({
   temperature: number;
   high: number;
   low: number;
-  icon: string;
+  icon: any;
 }) => (
   <View
     style={{
@@ -270,7 +270,7 @@ const ForecastCard = ({
     }}
   >
     <Image
-      source={require("../assets/images/icons/clouds.png")}
+      source={icon}
       style={{ width: 32, height: 32, marginBottom: 8 }}
     />
     <Text
@@ -364,13 +364,6 @@ export default function Index() {
         setSportsData(null);
       }
 
-      // if (futureResult.status === "fulfilled") {
-      //   setFutureData(futureResult.value);
-      // } else {
-      //   console.error("Future fetch failed:", futureResult.reason);
-      //   setFutureData(null);
-      // }
-
       if (alertsResult.status === "fulfilled") {
         setAlertsData(alertsResult.value);
       } else {
@@ -452,19 +445,14 @@ export default function Index() {
     },
   ];
 
-  const forecast: Array<{ day: string; temperature: number; high: number; low: number }> =
+  const forecast: Array<{ day: string; temperature: number; high: number; low: number; icon: any }> =
     forecastData?.forecast?.forecastday?.map((day: any) => ({
       day: new Date(day.date).toLocaleDateString("en-US", { weekday: "short" }),
       temperature: Math.round(day.day.avgtemp_c),
       high: Math.round(day.day.maxtemp_c),
       low: Math.round(day.day.mintemp_c),
-    })) || [
-      { day: "Mon", temperature: 20, high: 20, low: 15 },
-      { day: "Tue", temperature: 18, high: 18, low: 14 },
-      { day: "Wed", temperature: 22, high: 22, low: 16 },
-      { day: "Thu", temperature: 19, high: 19, low: 15 },
-      { day: "Fri", temperature: 21, high: 21, low: 16 },
-    ];
+      icon: getWeatherConfig(day.day.condition.text).icon,
+    }))
 
   const handleLocationSelect = (location: { label: string; query: string }) => {
     setSelectedLocation(location.query);
@@ -737,7 +725,7 @@ export default function Index() {
                   letterSpacing: -0.3,
                 }}
               >
-                5-Day Forecast
+                3-Day Forecast
               </Text>
             </View>
 
@@ -754,7 +742,7 @@ export default function Index() {
                   temperature={day.temperature}
                   high={day.high}
                   low={day.low}
-                  icon="cloud-outline"
+                  icon={day.icon}
                 />
               ))}
             </ScrollView>
