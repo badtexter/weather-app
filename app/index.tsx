@@ -17,6 +17,62 @@ import { getAlerts, getCurrent, getForecast, getLocations, getSports } from "../
 
 const { width } = Dimensions.get("window");
 
+// Weather condition to icon and color mapping
+interface WeatherConfig {
+  icon: any;
+  glowColor1: string;
+  glowColor2: string;
+}
+
+const getWeatherConfig = (condition: string): WeatherConfig => {
+  const conditionLower = condition.toLowerCase();
+  
+  if (conditionLower.includes("sunny") || conditionLower.includes("clear")) {
+    return {
+      icon: require("../assets/images/icons/sunny-day.png"),
+      glowColor1: "#FFE082",
+      glowColor2: "#FFD54F",
+    };
+  } else if (conditionLower.includes("cloud")) {
+    return {
+      icon: require("../assets/images/icons/cloudy-day.png"),
+      glowColor1: "#B0BEC5",
+      glowColor2: "#90A4AE",
+    };
+  } else if (conditionLower.includes("rain")) {
+    return {
+      icon: require("../assets/images/icons/rainy-day.png"),
+      glowColor1: "#64B5F6",
+      glowColor2: "#42A5F5",
+    };
+  } else if (conditionLower.includes("snow")) {
+    return {
+      icon: require("../assets/images/icons/snow.png"),
+      glowColor1: "#E3F2FD",
+      glowColor2: "#BBDEFB",
+    };
+  } else if (conditionLower.includes("thunder") || conditionLower.includes("storm")) {
+    return {
+      icon: require("../assets/images/icons/thunderstorm.png"),
+      glowColor1: "#A1887F",
+      glowColor2: "#8D6E63",
+    };
+  } else if (conditionLower.includes("fog") || conditionLower.includes("mist")) {
+    return {
+      icon: require("../assets/images/icons/foggy.png"),
+      glowColor1: "#CFD8DC",
+      glowColor2: "#B0BEC5",
+    };
+  }
+  
+  // Default to cloudy
+  return {
+    icon: require("../assets/images/icons/cloudy-day.png"),
+    glowColor1: "#B0BEC5",
+    glowColor2: "#90A4AE",
+  };
+};
+
 // Color palette
 const colors = {
   background: "#f8f8fa",
@@ -282,7 +338,7 @@ export default function Index() {
     try {
       const [currentResult, forecastResult, sportsResult, alertsResult] = await Promise.allSettled([
         getCurrent({ cityName: location, includeAqi: "yes" }),
-        getForecast({ cityName: location, days: 5, includeAqi: "yes", includeAlerts: "no" }),
+        getForecast({ cityName: location, days: 3, includeAqi: "yes", includeAlerts: "no" }),
         getSports({ cityName: location }),
         getAlerts({ cityName: location }),
       ]);
@@ -489,38 +545,48 @@ export default function Index() {
                 position: "relative",
               }}
             >
-              {/* outer glow */}
-              <View
-                style={{
-                  position: "absolute",
-                  width: 180,
-                  height: 180,
-                  borderRadius: 90,
-                  backgroundColor: "#FFE082",
-                  opacity: 0.18,
-                }}
-              />
+              {(() => {
+                const weatherConfig = getWeatherConfig(
+                  weatherData?.current?.condition?.text || "Cloudy"
+                );
+                
+                return (
+                  <>
+                    {/* outer glow */}
+                    <View
+                      style={{
+                        position: "absolute",
+                        width: 180,
+                        height: 180,
+                        borderRadius: 90,
+                        backgroundColor: weatherConfig.glowColor1,
+                        opacity: 0.18,
+                      }}
+                    />
 
-              {/* inner glow */}
-              <View
-                style={{
-                  position: "absolute",
-                  width: 130,
-                  height: 130,
-                  borderRadius: 65,
-                  backgroundColor: "#FFD54F",
-                  opacity: 0.25,
-                }}
-              />
+                    {/* inner glow */}
+                    <View
+                      style={{
+                        position: "absolute",
+                        width: 130,
+                        height: 130,
+                        borderRadius: 65,
+                        backgroundColor: weatherConfig.glowColor2,
+                        opacity: 0.25,
+                      }}
+                    />
 
-              <Image
-                source={require("../assets/images/icons/sunny-day.png")}
-                resizeMode="contain"
-                style={{
-                  width: 160,
-                  height: 160,
-                }}
-              />
+                    <Image
+                      source={weatherConfig.icon}
+                      resizeMode="contain"
+                      style={{
+                        width: 160,
+                        height: 160,
+                      }}
+                    />
+                  </>
+                );
+              })()}
             </View>
           </View>
 
