@@ -13,9 +13,65 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getAlerts, getCurrent, getForecast, getFuture, getLocations, getSports } from "../api/weather";
+import { getAlerts, getCurrent, getForecast, getLocations, getSports } from "../api/weather";
 
 const { width } = Dimensions.get("window");
+
+// Weather condition to icon and color mapping
+interface WeatherConfig {
+  icon: any;
+  glowColor1: string;
+  glowColor2: string;
+}
+
+const getWeatherConfig = (condition: string): WeatherConfig => {
+  const conditionLower = condition.toLowerCase();
+  
+  if (conditionLower.includes("sunny") || conditionLower.includes("clear")) {
+    return {
+      icon: require("../assets/images/icons/sunny-day.png"),
+      glowColor1: "#FFE082",
+      glowColor2: "#FFD54F",
+    };
+  } else if (conditionLower.includes("cloud")) {
+    return {
+      icon: require("../assets/images/icons/cloudy-day.png"),
+      glowColor1: "#B0BEC5",
+      glowColor2: "#90A4AE",
+    };
+  } else if (conditionLower.includes("rain")) {
+    return {
+      icon: require("../assets/images/icons/rainy-day.png"),
+      glowColor1: "#64B5F6",
+      glowColor2: "#42A5F5",
+    };
+  } else if (conditionLower.includes("snow")) {
+    return {
+      icon: require("../assets/images/icons/snow.png"),
+      glowColor1: "#E3F2FD",
+      glowColor2: "#BBDEFB",
+    };
+  } else if (conditionLower.includes("thunder") || conditionLower.includes("storm")) {
+    return {
+      icon: require("../assets/images/icons/thunderstorm.png"),
+      glowColor1: "#A1887F",
+      glowColor2: "#8D6E63",
+    };
+  } else if (conditionLower.includes("fog") || conditionLower.includes("mist")) {
+    return {
+      icon: require("../assets/images/icons/foggy.png"),
+      glowColor1: "#CFD8DC",
+      glowColor2: "#B0BEC5",
+    };
+  }
+  
+  // Default to cloudy
+  return {
+    icon: require("../assets/images/icons/cloudy-day.png"),
+    glowColor1: "#B0BEC5",
+    glowColor2: "#90A4AE",
+  };
+};
 
 // Color palette
 const colors = {
@@ -200,7 +256,7 @@ const ForecastCard = ({
   temperature: number;
   high: number;
   low: number;
-  icon: string;
+  icon: any;
 }) => (
   <View
     style={{
@@ -214,7 +270,7 @@ const ForecastCard = ({
     }}
   >
     <Image
-      source={require("../assets/images/icons/clouds.png")}
+      source={icon}
       style={{ width: 32, height: 32, marginBottom: 8 }}
     />
     <Text
@@ -280,11 +336,10 @@ export default function Index() {
   const fetchWeather = async (location: string) => {
     setLoading(true);
     try {
-      const [currentResult, forecastResult, sportsResult, futureResult, alertsResult] = await Promise.allSettled([
+      const [currentResult, forecastResult, sportsResult, alertsResult] = await Promise.allSettled([
         getCurrent({ cityName: location, includeAqi: "yes" }),
-        getForecast({ cityName: location, days: 5, includeAqi: "yes", includeAlerts: "no" }),
+        getForecast({ cityName: location, days: 3, includeAqi: "yes", includeAlerts: "no" }),
         getSports({ cityName: location }),
-        getFuture({ cityName: location, date: getFutureDate() }),
         getAlerts({ cityName: location }),
       ]);
 
@@ -307,13 +362,6 @@ export default function Index() {
       } else {
         console.error("Sports fetch failed:", sportsResult.reason);
         setSportsData(null);
-      }
-
-      if (futureResult.status === "fulfilled") {
-        setFutureData(futureResult.value);
-      } else {
-        console.error("Future fetch failed:", futureResult.reason);
-        setFutureData(null);
       }
 
       if (alertsResult.status === "fulfilled") {
@@ -397,19 +445,14 @@ export default function Index() {
     },
   ];
 
-  const forecast: Array<{ day: string; temperature: number; high: number; low: number }> =
+  const forecast: Array<{ day: string; temperature: number; high: number; low: number; icon: any }> =
     forecastData?.forecast?.forecastday?.map((day: any) => ({
       day: new Date(day.date).toLocaleDateString("en-US", { weekday: "short" }),
       temperature: Math.round(day.day.avgtemp_c),
       high: Math.round(day.day.maxtemp_c),
       low: Math.round(day.day.mintemp_c),
-    })) || [
-      { day: "Mon", temperature: 20, high: 20, low: 15 },
-      { day: "Tue", temperature: 18, high: 18, low: 14 },
-      { day: "Wed", temperature: 22, high: 22, low: 16 },
-      { day: "Thu", temperature: 19, high: 19, low: 15 },
-      { day: "Fri", temperature: 21, high: 21, low: 16 },
-    ];
+      icon: getWeatherConfig(day.day.condition.text).icon,
+    })) || [];
 
   const handleLocationSelect = (location: { label: string; query: string }) => {
     setSelectedLocation(location.query);
@@ -490,38 +533,48 @@ export default function Index() {
                 position: "relative",
               }}
             >
-              {/* outer glow */}
-              <View
-                style={{
-                  position: "absolute",
-                  width: 180,
-                  height: 180,
-                  borderRadius: 90,
-                  backgroundColor: "#FFE082",
-                  opacity: 0.18,
-                }}
-              />
+              {(() => {
+                const weatherConfig = getWeatherConfig(
+                  weatherData?.current?.condition?.text || "Cloudy"
+                );
+                
+                return (
+                  <>
+                    {/* outer glow */}
+                    <View
+                      style={{
+                        position: "absolute",
+                        width: 180,
+                        height: 180,
+                        borderRadius: 90,
+                        backgroundColor: weatherConfig.glowColor1,
+                        opacity: 0.18,
+                      }}
+                    />
 
-              {/* inner glow */}
-              <View
-                style={{
-                  position: "absolute",
-                  width: 130,
-                  height: 130,
-                  borderRadius: 65,
-                  backgroundColor: "#FFD54F",
-                  opacity: 0.25,
-                }}
-              />
+                    {/* inner glow */}
+                    <View
+                      style={{
+                        position: "absolute",
+                        width: 130,
+                        height: 130,
+                        borderRadius: 65,
+                        backgroundColor: weatherConfig.glowColor2,
+                        opacity: 0.25,
+                      }}
+                    />
 
-              <Image
-                source={require("../assets/images/icons/sunny-day.png")}
-                resizeMode="contain"
-                style={{
-                  width: 160,
-                  height: 160,
-                }}
-              />
+                    <Image
+                      source={weatherConfig.icon}
+                      resizeMode="contain"
+                      style={{
+                        width: 160,
+                        height: 160,
+                      }}
+                    />
+                  </>
+                );
+              })()}
             </View>
           </View>
 
@@ -672,7 +725,7 @@ export default function Index() {
                   letterSpacing: -0.3,
                 }}
               >
-                5-Day Forecast
+                3-Day Forecast
               </Text>
             </View>
 
@@ -689,7 +742,7 @@ export default function Index() {
                   temperature={day.temperature}
                   high={day.high}
                   low={day.low}
-                  icon="cloud-outline"
+                  icon={day.icon}
                 />
               ))}
             </ScrollView>
