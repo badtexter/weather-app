@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getAlerts, getCurrent, getForecast, getFuture, getLocations, getSports } from "../api/weather";
+import { getAlerts, getCurrent, getForecast, getLocations, getSports } from "../api/weather";
 
 const { width } = Dimensions.get("window");
 
@@ -280,11 +280,10 @@ export default function Index() {
   const fetchWeather = async (location: string) => {
     setLoading(true);
     try {
-      const [currentResult, forecastResult, sportsResult, futureResult, alertsResult] = await Promise.allSettled([
+      const [currentResult, forecastResult, sportsResult, alertsResult] = await Promise.allSettled([
         getCurrent({ cityName: location, includeAqi: "yes" }),
         getForecast({ cityName: location, days: 5, includeAqi: "yes", includeAlerts: "no" }),
         getSports({ cityName: location }),
-        getFuture({ cityName: location, date: getFutureDate() }),
         getAlerts({ cityName: location }),
       ]);
 
@@ -309,12 +308,12 @@ export default function Index() {
         setSportsData(null);
       }
 
-      if (futureResult.status === "fulfilled") {
-        setFutureData(futureResult.value);
-      } else {
-        console.error("Future fetch failed:", futureResult.reason);
-        setFutureData(null);
-      }
+      // if (futureResult.status === "fulfilled") {
+      //   setFutureData(futureResult.value);
+      // } else {
+      //   console.error("Future fetch failed:", futureResult.reason);
+      //   setFutureData(null);
+      // }
 
       if (alertsResult.status === "fulfilled") {
         setAlertsData(alertsResult.value);
