@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 35,
   },
   mainCard: {
     backgroundColor: '#FFFFFF',

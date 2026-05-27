@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingTop: 16,
+    paddingTop: 35,
   },
   section: {
     marginBottom: 24,
