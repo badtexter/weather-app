@@ -1,34 +1,45 @@
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AppThemeProvider, useAppTheme } from "../services/theme";
 
 export default function RootLayout() {
+  return (
+    <AppThemeProvider>
+      <RootTabs />
+    </AppThemeProvider>
+  );
+}
+
+function RootTabs() {
+  const { colors } = useAppTheme();
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Tabs
         screenOptions={{
           tabBarStyle: {
-            backgroundColor: "#FFFFFF",
+            backgroundColor: colors.tabBackground,
             borderTopWidth: 0.5,
-            borderTopColor: "#E5E5EA",
+            borderTopColor: colors.tabBorder,
             height: 70,
             paddingBottom: 15,
             paddingTop: 8,
           },
-          tabBarActiveTintColor: "#007AFF",
-          tabBarInactiveTintColor: "#8E8E93",
+          tabBarActiveTintColor: colors.accent,
+          tabBarInactiveTintColor: colors.textSecondary,
           tabBarLabelStyle: {
             fontSize: 11,
             fontWeight: "500",
           },
           headerStyle: {
-            backgroundColor: "#FFFFFF",
+            backgroundColor: colors.tabBackground,
           },
           headerShadowVisible: false,
           headerTitleStyle: {
             fontSize: 26,
             fontWeight: "600",
-            color: "#1C1C1E",
+            color: colors.textPrimary,
           },
           headerTitleAlign: "center",
         }}
