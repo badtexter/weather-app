@@ -2,11 +2,14 @@ import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppThemeProvider, useAppTheme } from "../services/theme";
+import { UnitsProvider } from "../services/units";
 
 export default function RootLayout() {
   return (
     <AppThemeProvider>
-      <RootTabs />
+      <UnitsProvider>
+        <RootTabs />
+      </UnitsProvider>
     </AppThemeProvider>
   );
 }
