@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAlerts, getCurrent, getForecast, getLocations, getSports } from "../api/weather";
 import { useAppTheme } from "../services/theme";
+import { useUnits } from "../services/units";
 import { getSavedLocation, saveSelectedLocation } from "../services/weatherNotifications";
 
 const { width } = Dimensions.get("window");
@@ -279,9 +280,9 @@ const ForecastCard = ({
   onPress,
 }: {
   day: string;
-  temperature: number;
-  high: number;
-  low: number;
+  temperature: string;
+  high: string;
+  low: string;
   icon: any;
   selected: boolean;
   onPress: () => void;
@@ -321,7 +322,7 @@ const ForecastCard = ({
         marginBottom: 4,
       }}
     >
-      {temperature}°
+      {temperature}
     </Text>
     <Text
       style={{
@@ -329,7 +330,7 @@ const ForecastCard = ({
         color: selected ? "rgba(255,255,255,0.75)" : colors.text.secondary,
       }}
     >
-      {low}°
+      {low}
     </Text>
   </TouchableOpacity>
 );
@@ -344,9 +345,9 @@ const ForecastListRow = ({
   onPress,
 }: {
   day: string;
-  temperature: number;
-  high: number;
-  low: number;
+  temperature: string;
+  high: string;
+  low: string;
   icon: any;
   selected: boolean;
   onPress: () => void;
@@ -383,7 +384,7 @@ const ForecastListRow = ({
           marginTop: 3,
         }}
       >
-        Min. {low}° / maks. {high}°
+        Min. {low} / maks. {high}
       </Text>
     </View>
     <Image source={icon} style={{ width: 36, height: 36, marginHorizontal: 14 }} />
@@ -397,7 +398,7 @@ const ForecastListRow = ({
         lineHeight: 32,
       }}
     >
-      {temperature}°
+      {temperature}
     </Text>
   </TouchableOpacity>
 );
@@ -410,7 +411,7 @@ const HourlyCard = ({
   rainChance,
 }: {
   time: string;
-  temperature: number;
+  temperature: string;
   condition: string;
   icon: any;
   rainChance?: number;
@@ -446,7 +447,7 @@ const HourlyCard = ({
         color: colors.accent,
       }}
     >
-      {temperature}°
+      {temperature}
     </Text>
     {typeof rainChance === "number" && rainChance > 0 && (
       <Text
@@ -464,6 +465,7 @@ const HourlyCard = ({
 
 export default function Index() {
   const { colors: themeColors, isDark } = useAppTheme();
+  const { formatTemperature, formatWindSpeed } = useUnits();
   colors.background = themeColors.background;
   colors.card = themeColors.card;
   colors.search = themeColors.search;
@@ -619,7 +621,7 @@ export default function Index() {
     {
       icon: "speedometer-outline",
       label: "Wiatr",
-      value: weatherData ? `${weatherData.current.wind_kph} km/h` : "-",
+      value: weatherData ? formatWindSpeed(weatherData.current.wind_kph) : "-",
     },
     {
       icon: "water-outline",
@@ -636,13 +638,13 @@ export default function Index() {
   const forecast: Array<{
     date: string;
     day: string;
-    temperature: number;
-    high: number;
-    low: number;
+    temperature: string;
+    high: string;
+    low: string;
     icon: any;
     hours: Array<{
       time: string;
-      temperature: number;
+      temperature: string;
       condition: string;
       icon: any;
       rainChance?: number;
@@ -651,14 +653,14 @@ export default function Index() {
     forecastData?.forecast?.forecastday?.map((day: any, index: number) => ({
       date: day.date,
       day: formatForecastDay(day.date, index),
-      temperature: Math.round(day.day.avgtemp_c),
-      high: Math.round(day.day.maxtemp_c),
-      low: Math.round(day.day.mintemp_c),
+      temperature: formatTemperature(day.day.avgtemp_c),
+      high: formatTemperature(day.day.maxtemp_c),
+      low: formatTemperature(day.day.mintemp_c),
       icon: getWeatherConfig(day.day.condition.text).icon,
       hours:
         day.hour?.map((hour: any) => ({
           time: hour.time?.split(" ")[1] || "",
-          temperature: Math.round(hour.temp_c),
+          temperature: formatTemperature(hour.temp_c),
           condition: translateCondition(hour.condition?.text || ""),
           icon: getWeatherConfig(hour.condition?.text || "Cloudy").icon,
           rainChance: hour.chance_of_rain,
@@ -747,7 +749,7 @@ export default function Index() {
                 lineHeight: 90,
               }}
             >
-              {weatherData ? `${Math.round(weatherData.current.temp_c)}°` : "--°"}
+              {formatTemperature(weatherData?.current?.temp_c)}
             </Text>
             <Text
               style={{
