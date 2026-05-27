@@ -252,17 +252,23 @@ const ForecastCard = ({
   high,
   low,
   icon,
+  selected,
+  onPress,
 }: {
   day: string;
   temperature: number;
   high: number;
   low: number;
   icon: any;
+  selected: boolean;
+  onPress: () => void;
 }) => (
-  <View
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.75}
     style={{
       width: 88,
-      backgroundColor: colors.card,
+      backgroundColor: selected ? colors.accent : colors.card,
       borderRadius: 20,
       paddingVertical: 18,
       alignItems: "center",
@@ -278,7 +284,7 @@ const ForecastCard = ({
       style={{
         fontSize: 14,
         fontWeight: "600",
-        color: colors.text.primary,
+        color: selected ? "#FFFFFF" : colors.text.primary,
         marginBottom: 4,
       }}
     >
@@ -288,7 +294,7 @@ const ForecastCard = ({
       style={{
         fontSize: 18,
         fontWeight: "700",
-        color: colors.accent,
+        color: selected ? "#FFFFFF" : colors.accent,
         marginBottom: 4,
       }}
     >
@@ -297,11 +303,81 @@ const ForecastCard = ({
     <Text
       style={{
         fontSize: 12,
-        color: colors.text.secondary,
+        color: selected ? "rgba(255,255,255,0.75)" : colors.text.secondary,
       }}
     >
       {low}°
     </Text>
+  </TouchableOpacity>
+);
+
+const HourlyCard = ({
+  time,
+  temperature,
+  condition,
+  icon,
+  rainChance,
+}: {
+  time: string;
+  temperature: number;
+  condition: string;
+  icon: any;
+  rainChance?: number;
+}) => (
+  <View
+    style={{
+      width: 96,
+      minHeight: 138,
+      backgroundColor: colors.card,
+      borderRadius: 18,
+      paddingVertical: 14,
+      paddingHorizontal: 10,
+      alignItems: "center",
+      marginRight: 12,
+      ...shadows.small,
+    }}
+  >
+    <Text
+      style={{
+        fontSize: 13,
+        fontWeight: "600",
+        color: colors.text.primary,
+        marginBottom: 8,
+      }}
+    >
+      {time}
+    </Text>
+    <Image source={icon} style={{ width: 34, height: 34, marginBottom: 8 }} />
+    <Text
+      style={{
+        fontSize: 20,
+        fontWeight: "700",
+        color: colors.accent,
+        marginBottom: 4,
+      }}
+    >
+      {temperature}°
+    </Text>
+    <Text
+      numberOfLines={1}
+      style={{
+        fontSize: 11,
+        color: colors.text.secondary,
+        marginBottom: 4,
+      }}
+    >
+      {condition}
+    </Text>
+    {typeof rainChance === "number" && (
+      <Text
+        style={{
+          fontSize: 11,
+          color: colors.text.secondary,
+        }}
+      >
+        {rainChance}% rain
+      </Text>
+    )}
   </View>
 );
 
@@ -325,6 +401,7 @@ export default function Index() {
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [weatherData, setWeatherData] = useState<any | null>(null);
   const [forecastData, setForecastData] = useState<any | null>(null);
+  const [selectedForecastDayIndex, setSelectedForecastDayIndex] = useState(0);
   const [sportsData, setSportsData] = useState<any | null>(null);
   const [futureData, setFutureData] = useState<any | null>(null);
   const [alertsData, setAlertsData] = useState<any | null>(null);
@@ -407,6 +484,10 @@ export default function Index() {
     fetchWeather(selectedLocation);
   }, [preferencesLoaded, selectedLocation]);
 
+  useEffect(() => {
+    setSelectedForecastDayIndex(0);
+  }, [forecastData]);
+
   const fetchLocationSuggestions = async (query: string) => {
     if (!query.trim()) {
       setLocationOptions([
@@ -471,14 +552,39 @@ export default function Index() {
     },
   ];
 
-  const forecast: Array<{ day: string; temperature: number; high: number; low: number; icon: any }> =
+  const forecast: Array<{
+    date: string;
+    day: string;
+    temperature: number;
+    high: number;
+    low: number;
+    icon: any;
+    hours: Array<{
+      time: string;
+      temperature: number;
+      condition: string;
+      icon: any;
+      rainChance?: number;
+    }>;
+  }> =
     forecastData?.forecast?.forecastday?.map((day: any) => ({
+      date: day.date,
       day: new Date(day.date).toLocaleDateString("en-US", { weekday: "short" }),
       temperature: Math.round(day.day.avgtemp_c),
       high: Math.round(day.day.maxtemp_c),
       low: Math.round(day.day.mintemp_c),
       icon: getWeatherConfig(day.day.condition.text).icon,
+      hours:
+        day.hour?.map((hour: any) => ({
+          time: hour.time?.split(" ")[1] || "",
+          temperature: Math.round(hour.temp_c),
+          condition: hour.condition?.text || "",
+          icon: getWeatherConfig(hour.condition?.text || "Cloudy").icon,
+          rainChance: hour.chance_of_rain,
+        })) || [],
     })) || [];
+
+  const selectedForecastDay = forecast[selectedForecastDayIndex] || forecast[0];
 
   const handleLocationSelect = (location: { label: string; query: string }) => {
     setSelectedLocation(location.query);
@@ -565,40 +671,14 @@ export default function Index() {
                 );
                 
                 return (
-                  <>
-                    {/* outer glow */}
-                    <View
-                      style={{
-                        position: "absolute",
-                        width: 180,
-                        height: 180,
-                        borderRadius: 90,
-                        backgroundColor: weatherConfig.glowColor1,
-                        opacity: 0.18,
-                      }}
-                    />
-
-                    {/* inner glow */}
-                    <View
-                      style={{
-                        position: "absolute",
-                        width: 130,
-                        height: 130,
-                        borderRadius: 65,
-                        backgroundColor: weatherConfig.glowColor2,
-                        opacity: 0.25,
-                      }}
-                    />
-
-                    <Image
-                      source={weatherConfig.icon}
-                      resizeMode="contain"
-                      style={{
-                        width: 160,
-                        height: 160,
-                      }}
-                    />
-                  </>
+                  <Image
+                    source={weatherConfig.icon}
+                    resizeMode="contain"
+                    style={{
+                      width: 160,
+                      height: 160,
+                    }}
+                  />
                 );
               })()}
             </View>
@@ -703,6 +783,69 @@ export default function Index() {
                   high={day.high}
                   low={day.low}
                   icon={day.icon}
+                  selected={selectedForecastDayIndex === index}
+                  onPress={() => setSelectedForecastDayIndex(index)}
+                />
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Hourly Forecast Section */}
+          <View
+            style={{
+              marginBottom: 28,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: 24,
+                marginBottom: 16,
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons name="time-outline" size={18} color={themeColors.textSecondary} />
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: "500",
+                    color: themeColors.textPrimary,
+                    marginLeft: 10,
+                    letterSpacing: -0.3,
+                  }}
+                >
+                  Hourly Forecast
+                </Text>
+              </View>
+              {selectedForecastDay && (
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: themeColors.textSecondary,
+                    fontWeight: "500",
+                  }}
+                >
+                  {selectedForecastDay.day}
+                </Text>
+              )}
+            </View>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 24, paddingRight: 40 }}
+              scrollEventThrottle={16}
+            >
+              {selectedForecastDay?.hours?.map((hour, index) => (
+                <HourlyCard
+                  key={`${selectedForecastDay.date}-${hour.time}-${index}`}
+                  time={hour.time}
+                  temperature={hour.temperature}
+                  condition={hour.condition}
+                  icon={hour.icon}
+                  rainChance={hour.rainChance}
                 />
               ))}
             </ScrollView>
