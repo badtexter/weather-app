@@ -1,5 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Notifications from "expo-notifications";
+import cancelScheduledNotificationAsync from "expo-notifications/build/cancelScheduledNotificationAsync";
+import { AndroidImportance } from "expo-notifications/build/NotificationChannelManager.types";
+import { getPermissionsAsync, requestPermissionsAsync } from "expo-notifications/build/NotificationPermissions";
+import { setNotificationHandler } from "expo-notifications/build/NotificationsHandler";
+import { SchedulableTriggerInputTypes } from "expo-notifications/build/Notifications.types";
+import scheduleNotificationAsync from "expo-notifications/build/scheduleNotificationAsync";
+import setNotificationChannelAsync from "expo-notifications/build/setNotificationChannelAsync";
 import { Platform } from "react-native";
 
 export const SELECTED_LOCATION_KEY = "weather.selectedLocation";
@@ -9,7 +15,7 @@ const WEATHER_NOTIFICATIONS_ENABLED_KEY = "weather.notificationsEnabled";
 const WEATHER_NOTIFICATION_CHANNEL_ID = "weather-updates";
 const THREE_HOURS_IN_SECONDS = 3 * 60 * 60;
 
-Notifications.setNotificationHandler({
+setNotificationHandler({
   handleNotification: async () => ({
     shouldPlaySound: false,
     shouldSetBadge: false,
@@ -32,18 +38,18 @@ export async function getWeatherNotificationsEnabled() {
 
 async function requestNotificationPermission() {
   if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync(WEATHER_NOTIFICATION_CHANNEL_ID, {
+    await setNotificationChannelAsync(WEATHER_NOTIFICATION_CHANNEL_ID, {
       name: "Pogoda",
-      importance: Notifications.AndroidImportance.DEFAULT,
+      importance: AndroidImportance.DEFAULT,
     });
   }
 
-  const currentPermissions = await Notifications.getPermissionsAsync();
+  const currentPermissions = await getPermissionsAsync();
   if (currentPermissions.status === "granted") {
     return true;
   }
 
-  const requestedPermissions = await Notifications.requestPermissionsAsync();
+  const requestedPermissions = await requestPermissionsAsync();
   return requestedPermissions.status === "granted";
 }
 
@@ -51,7 +57,7 @@ export async function disableWeatherNotifications() {
   const notificationId = await AsyncStorage.getItem(WEATHER_NOTIFICATION_ID_KEY);
 
   if (notificationId) {
-    await Notifications.cancelScheduledNotificationAsync(notificationId);
+    await cancelScheduledNotificationAsync(notificationId);
   }
 
   await AsyncStorage.removeItem(WEATHER_NOTIFICATION_ID_KEY);
@@ -76,14 +82,14 @@ export async function enableWeatherNotifications(params: {
     typeof params.temperatureC === "number" ? `${Math.round(params.temperatureC)}°C` : "sprawdź pogodę";
   const conditionText = params.condition ? `, ${params.condition}` : "";
 
-  const notificationId = await Notifications.scheduleNotificationAsync({
+  const notificationId = await scheduleNotificationAsync({
     content: {
       title: "Aktualna pogoda",
       body: `${params.location}: ${temperatureText}${conditionText}`,
       data: { screen: "weather", location: params.location },
     },
     trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      type: SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: THREE_HOURS_IN_SECONDS,
       repeats: true,
       channelId: WEATHER_NOTIFICATION_CHANNEL_ID,
