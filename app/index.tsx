@@ -3,17 +3,17 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Animated,
   Dimensions,
   Image,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAlerts, getCurrent, getForecast, getLocations, getSports } from "../api/weather";
+import { getSavedLocation, saveSelectedLocation } from "../services/weatherNotifications";
 
 const { width } = Dimensions.get("window");
 
@@ -132,7 +132,7 @@ const SearchBar = ({
       value={value}
       onChangeText={onChangeText}
       onFocus={onFocus}
-      placeholder="Search city"
+      placeholder="Wyszukaj lokalizację"
       placeholderTextColor={colors.text.secondary}
       style={{
         marginLeft: 12,
@@ -305,13 +305,10 @@ const ForecastCard = ({
 );
 
 export default function Index() {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(20)).current;
-  const scaleAnim = useRef(new Animated.Value(0.98)).current;
-  
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Kalisz");
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [weatherData, setWeatherData] = useState<any | null>(null);
   const [forecastData, setForecastData] = useState<any | null>(null);
   const [sportsData, setSportsData] = useState<any | null>(null);
@@ -378,8 +375,23 @@ export default function Index() {
   };
 
   useEffect(() => {
+    getSavedLocation()
+      .then(location => {
+        setSelectedLocation(location);
+      })
+      .finally(() => {
+        setPreferencesLoaded(true);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!preferencesLoaded) {
+      return;
+    }
+
+    saveSelectedLocation(selectedLocation);
     fetchWeather(selectedLocation);
-  }, [selectedLocation]);
+  }, [preferencesLoaded, selectedLocation]);
 
   const fetchLocationSuggestions = async (query: string) => {
     if (!query.trim()) {
@@ -511,7 +523,7 @@ export default function Index() {
                 fontWeight: "400", 
               }}
             >
-              Poland
+              Polska
             </Text>
           </View>
 
