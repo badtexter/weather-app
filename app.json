@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "WeatherApp",
-    "slug": "WeatherApp",
-    "version": "1.0.0",
+    "name": "SkyCheck",
+    "slug": "SkyCheck",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "weatherapp",
+    "icon": "./assets/images/main-icon.png",
+    "scheme": "skycheck",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
