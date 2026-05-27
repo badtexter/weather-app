@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAlerts, getCurrent, getForecast, getLocations, getSports } from "../api/weather";
+import { useAppTheme } from "../services/theme";
 import { getSavedLocation, saveSelectedLocation } from "../services/weatherNotifications";
 
 const { width } = Dimensions.get("window");
@@ -305,6 +306,19 @@ const ForecastCard = ({
 );
 
 export default function Index() {
+  const { colors: themeColors, isDark } = useAppTheme();
+  colors.background = themeColors.background;
+  colors.card = themeColors.card;
+  colors.search = themeColors.search;
+  colors.text.primary = themeColors.textPrimary;
+  colors.text.secondary = themeColors.textSecondary;
+  colors.text.tertiary = themeColors.border;
+  colors.accent = themeColors.accent;
+  colors.secondaryAccent = themeColors.secondaryAccent;
+  colors.shadow = themeColors.shadow;
+  shadows.small.shadowColor = themeColors.shadow;
+  shadows.medium.shadowColor = themeColors.shadow;
+
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Kalisz");
@@ -476,10 +490,10 @@ export default function Index() {
 
   return (
     <LinearGradient
-      colors={["#F3F0FF", "#FFFFFF", "#EAF6FF"]}
+      colors={themeColors.gradient}
       style={{ flex: 1 }}
     >
-      <StatusBar style="dark" />
+      <StatusBar style={isDark ? "light" : "dark"} />
 
       <SafeAreaView style={{ flex: 1 }}>
         {/* Search Section */}
@@ -510,7 +524,7 @@ export default function Index() {
                 fontSize: 34,
                 fontWeight: "500",
                 letterSpacing: -0.8,
-                color: colors.text.primary,
+                color: themeColors.textPrimary,
               }}
             >
               {selectedLocation}
@@ -518,7 +532,7 @@ export default function Index() {
             <Text
               style={{
                 fontSize: 16,
-                color: colors.text.secondary,
+                color: themeColors.textSecondary,
                 marginTop: 4,
                 fontWeight: "400", 
               }}
@@ -601,7 +615,7 @@ export default function Index() {
               style={{
                 fontSize: 88,
                 fontWeight: "100",
-                color: colors.text.primary,
+                color: themeColors.textPrimary,
                 letterSpacing: -5,
                 lineHeight: 90,
               }}
@@ -612,7 +626,7 @@ export default function Index() {
             <Text
               style={{
                 fontSize: 17,
-                color: colors.text.secondary,
+                color: themeColors.textSecondary,
                 marginTop: 2,
                 fontWeight: "400",
                 letterSpacing: -0.2,
@@ -659,14 +673,14 @@ export default function Index() {
               <Ionicons
                 name="calendar-outline"
                 size={18}
-                color="#8E8E93"
+                color={themeColors.textSecondary}
               />
 
               <Text
                 style={{
                   fontSize: 20,
                   fontWeight: "500",
-                  color: colors.text.primary,
+                  color: themeColors.textPrimary,
                   marginLeft: 10,
                   letterSpacing: -0.3,
                 }}
