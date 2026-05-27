@@ -385,10 +385,10 @@ export default function Index() {
     if (!query.trim()) {
       setLocationOptions([
         { label: "Warszawa", query: "Warszawa" },
-        { label: "Kraków", query: "Kraków" },
-        { label: "Gdańsk", query: "Gdańsk" },
-        { label: "Poznań", query: "Poznań" },
-        { label: "Wrocław", query: "Wrocław" },
+        { label: "Kraków", query: "Krakow" },
+        { label: "Gdańsk", query: "Gdansk" },
+        { label: "Poznań", query: "Poznan" },
+        { label: "Wrocław", query: "Wroclaw" },
       ]);
       return;
     }
@@ -630,73 +630,7 @@ export default function Index() {
             ))}
           </View>
 
-          {/* Extra Endpoint Cards */}
-          <View
-            style={{
-              marginBottom: 28,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingHorizontal: 24,
-                marginBottom: 16,
-              }}
-            >
-              <Ionicons name="apps-outline" size={18} color="#8E8E93" />
-
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: "500",
-                  color: colors.text.primary,
-                  marginLeft: 10,
-                  letterSpacing: -0.3,
-                }}
-              >
-                Extra endpoints
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: 24,
-              }}
-            >
-              <InfoCard
-                icon="trophy-outline"
-                label="Sports"
-                value={
-                  sportsData
-                    ? sportsData.sports?.[0]?.name || "Available"
-                    : "–"
-                }
-              />
-              <InfoCard
-                icon="calendar-outline"
-                label="Future"
-                value={
-                  futureData && futureData.forecast?.forecastday?.[0]
-                    ? `${Math.round(futureData.forecast.forecastday[0].day.avgtemp_c)}°`
-                    : "–"
-                }
-              />
-              <InfoCard
-                icon="alert-circle-outline"
-                label="Alerts"
-                value={
-                  alertsData?.alerts?.alert?.[0]?.headline
-                    ? alertsData.alerts.alert[0].headline
-                    : "No alerts"
-                }
-              />
-            </View>
-          </View>
-
-          {/* 5-Day Forecast Section */}
+          {/* 3-Day Forecast Section */}
           <View
             style={{
               marginBottom: 28,
