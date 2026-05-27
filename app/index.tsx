@@ -385,10 +385,10 @@ export default function Index() {
     if (!query.trim()) {
       setLocationOptions([
         { label: "Warszawa", query: "Warszawa" },
-        { label: "Kraków", query: "Kraków" },
-        { label: "Gdańsk", query: "Gdańsk" },
-        { label: "Poznań", query: "Poznań" },
-        { label: "Wrocław", query: "Wrocław" },
+        { label: "Kraków", query: "Krakow" },
+        { label: "Gdańsk", query: "Gdansk" },
+        { label: "Poznań", query: "Poznan" },
+        { label: "Wrocław", query: "Wroclaw" },
       ]);
       return;
     }
