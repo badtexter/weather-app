@@ -1,69 +1,28 @@
-import { Drawer } from "expo-router/drawer";
+import { Tabs } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Drawer
+      <Tabs
         screenOptions={{
-          drawerType: "slide",
-
-          drawerStyle: {
-            backgroundColor: "#F5F5F7",
-            width: "82%",
+          tabBarStyle: {
+            backgroundColor: "#FFFFFF",
+            borderTopWidth: 0.5,
+            borderTopColor: "#E5E5EA",
           },
-
-          overlayColor: "rgba(0,0,0,0.15)",
-
+          tabBarActiveTintColor: "#007AFF",
+          tabBarInactiveTintColor: "#8E8E93",
           headerStyle: {
             backgroundColor: "#FFFFFF",
           },
-
           headerShadowVisible: false,
-
-          headerTitleStyle: {
-            fontSize: 18,
-            fontWeight: "600",
-          },
-
-          headerTintColor: "#007AFF",
-
-          drawerActiveBackgroundColor: "#E9E9EB",
-          drawerActiveTintColor: "#000000",
-
-          drawerInactiveTintColor: "#6E6E73",
-
-          drawerLabelStyle: {
-            marginLeft: 8,
-            fontSize: 16,
-            fontWeight: "500",
-          },
         }}
       >
-        <Drawer.Screen
-          name="index"
-          options={{
-            title: "Pogoda",
-            drawerLabel: "Pogoda",
-          }}
-        />
-
-        <Drawer.Screen
-          name="settings"
-          options={{
-            title: "Ustawienia",
-            drawerLabel: "Ustawienia",
-          }}
-        />
-
-        <Drawer.Screen
-          name="info"
-          options={{
-            title: "Informacje",
-            drawerLabel: "Informacje",
-          }}
-        />
-      </Drawer>
+        <Tabs.Screen name="index" options={{ title: "Pogoda", headerShown: false }} />
+        <Tabs.Screen name="settings" options={{ title: "Ustawienia", headerShown: false }} />
+        <Tabs.Screen name="info" options={{ title: "Informacje", headerShown: false }} />
+      </Tabs>
     </GestureHandlerRootView>
   );
 }
