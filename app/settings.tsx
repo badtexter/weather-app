@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { getCurrent } from "../api/weather";
 import { useAppTheme } from "../services/theme";
+import { useUnits } from "../services/units";
 import {
   disableWeatherNotifications,
   enableWeatherNotifications,
@@ -11,11 +12,10 @@ import {
 
 export default function Settings() {
   const { colors, theme, toggleTheme } = useAppTheme();
+  const { temperatureUnit, windSpeedUnit, toggleTemperatureUnit, cycleWindSpeedUnit } = useUnits();
   const [notifications, setNotifications] = useState(false);
   const [notificationPending, setNotificationPending] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState("");
-  const [temperatureUnit, setTemperatureUnit] = useState("celsius");
-  const [windSpeedUnit, setWindSpeedUnit] = useState("kmh");
 
   useEffect(() => {
     getWeatherNotificationsEnabled().then(setNotifications);
@@ -116,7 +116,7 @@ export default function Settings() {
           <View style={cardStyle}>
             <TouchableOpacity
               style={cellStyle}
-              onPress={() => setTemperatureUnit(temperatureUnit === "celsius" ? "fahrenheit" : "celsius")}
+              onPress={toggleTemperatureUnit}
               activeOpacity={0.7}
             >
               <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>Temperatura</Text>
@@ -132,12 +132,7 @@ export default function Settings() {
 
             <TouchableOpacity
               style={cellStyle}
-              onPress={() => {
-                const units = ["kmh", "ms", "mph"];
-                const currentIndex = units.indexOf(windSpeedUnit);
-                const next = units[(currentIndex + 1) % units.length];
-                setWindSpeedUnit(next);
-              }}
+              onPress={cycleWindSpeedUnit}
               activeOpacity={0.7}
             >
               <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>Prędkość wiatru</Text>
