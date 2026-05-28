@@ -65,10 +65,10 @@ export function UnitsProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (temperatureUnit === "fahrenheit") {
-      return `${Math.round((tempC * 9) / 5 + 32)}°F`;
+      return `${Math.round((tempC * 9) / 5 + 32)}°`;
     }
 
-    return `${Math.round(tempC)}°C`;
+    return `${Math.round(tempC)}°`;
   };
 
   const formatWindSpeed = (windKph?: number | null) => {

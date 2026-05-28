@@ -741,16 +741,30 @@ export default function Index() {
           </View>
 
           <View style={{ alignItems: "center", marginBottom: 20 }}>
-            <Text
-              style={{
-                fontSize: 86,
-                fontWeight: "100",
-                color: themeColors.textPrimary,
-                lineHeight: 90,
-              }}
-            >
-              {formatTemperature(weatherData?.current?.temp_c)}
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+              <Text
+                style={{
+                  fontSize: 72,
+                  fontWeight: "100",
+                  color: themeColors.textPrimary,
+                  lineHeight: 90,
+                }}
+              >
+                {formatTemperature(weatherData?.current?.temp_c)}
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 26,
+                  fontWeight: "400",
+                  color: themeColors.textPrimary,
+                  marginTop: 12,
+                  marginLeft: 2,
+                }}
+              >
+                
+              </Text>
+            </View>
             <Text
               style={{
                 fontSize: 17,
