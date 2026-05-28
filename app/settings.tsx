@@ -66,8 +66,10 @@ export default function Settings() {
     }
   };
 
-  const cardStyle = [styles.card, { backgroundColor: colors.card, shadowColor: colors.shadow }];
-  const cellStyle = [styles.cell, { backgroundColor: colors.card }];
+  const textColor = theme === "light" ? "#111" : "#FFFFFF";
+  const textSecondary = theme === "light" ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.6)";
+  const textTertiary = theme === "light" ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.35)";
+  const borderColor = theme === "light" ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.08)";
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -76,73 +78,72 @@ export default function Settings() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
+        {/* Wygląd */}
         <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Wygląd</Text>
-          <View style={cardStyle}>
-            <TouchableOpacity style={cellStyle} onPress={toggleTheme} activeOpacity={0.7}>
-              <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>Motyw</Text>
+          <Text style={[styles.sectionHeader, { color: textSecondary }]}>WYGLĄD</Text>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor, borderWidth: theme === "light" ? 0 : 0.5 }]}>
+            <TouchableOpacity style={styles.cell} onPress={toggleTheme} activeOpacity={0.6}>
+              <Text style={[styles.cellLabel, { color: textColor }]}>Motyw</Text>
               <View style={styles.cellRight}>
-                <Text style={[styles.cellValue, { color: colors.textSecondary }]}>
+                <Text style={[styles.cellValue, { color: textSecondary }]}>
                   {theme === "light" ? "Jasny" : "Ciemny"}
                 </Text>
-                <Text style={[styles.chevron, { color: colors.textTertiary }]}>›</Text>
+                <Text style={[styles.chevron, { color: textTertiary }]}>›</Text>
               </View>
             </TouchableOpacity>
           </View>
         </View>
 
+        {/* Powiadomienia */}
         <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Powiadomienia</Text>
-          <View style={cardStyle}>
-            <View style={cellStyle}>
-              <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>Prognoza pogodowa</Text>
+          <Text style={[styles.sectionHeader, { color: textSecondary }]}>POWIADOMIENIA</Text>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor, borderWidth: theme === "light" ? 0 : 0.5 }]}>
+            <View style={styles.cell}>
+              <Text style={[styles.cellLabel, { color: textColor }]}>Prognoza pogodowa</Text>
               <Switch
                 value={notifications}
                 onValueChange={handleNotificationsChange}
                 disabled={notificationPending}
-                trackColor={{ false: colors.border, true: colors.secondaryAccent }}
-                ios_backgroundColor={colors.border}
+                trackColor={{ false: borderColor, true: "#4A90E2" }}
+                ios_backgroundColor={borderColor}
                 thumbColor="#FFFFFF"
               />
             </View>
           </View>
-          <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-            {notificationStatus || "Powiadomienia będą wysyłane co 3 godziny"}
-          </Text>
+          {notificationStatus ? (
+            <Text style={[styles.footerText, { color: textSecondary }]}>{notificationStatus}</Text>
+          ) : (
+            <Text style={[styles.footerText, { color: textSecondary }]}>
+              Powiadomienia będą wysyłane co 3 godziny
+            </Text>
+          )}
         </View>
 
+        {/* Jednostki */}
         <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Jednostki</Text>
-          <View style={cardStyle}>
-            <TouchableOpacity
-              style={cellStyle}
-              onPress={toggleTemperatureUnit}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>Temperatura</Text>
+          <Text style={[styles.sectionHeader, { color: textSecondary }]}>JEDNOSTKI</Text>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor, borderWidth: theme === "light" ? 0 : 0.5 }]}>
+            <TouchableOpacity style={styles.cell} onPress={toggleTemperatureUnit} activeOpacity={0.6}>
+              <Text style={[styles.cellLabel, { color: textColor }]}>Temperatura</Text>
               <View style={styles.cellRight}>
-                <Text style={[styles.cellValue, { color: colors.secondaryAccent }]}>
+                <Text style={[styles.cellValue, { color: "#4A90E2" }]}>
                   {temperatureUnit === "celsius" ? "°C" : "°F"}
                 </Text>
-                <Text style={[styles.chevron, { color: colors.textTertiary }]}>›</Text>
+                <Text style={[styles.chevron, { color: textTertiary }]}>›</Text>
               </View>
             </TouchableOpacity>
 
-            <View style={[styles.separator, { backgroundColor: colors.border }]} />
+            <View style={[styles.separator, { backgroundColor: borderColor }]} />
 
-            <TouchableOpacity
-              style={cellStyle}
-              onPress={cycleWindSpeedUnit}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>Prędkość wiatru</Text>
+            <TouchableOpacity style={styles.cell} onPress={cycleWindSpeedUnit} activeOpacity={0.6}>
+              <Text style={[styles.cellLabel, { color: textColor }]}>Prędkość wiatru</Text>
               <View style={styles.cellRight}>
-                <Text style={[styles.cellValue, { color: colors.secondaryAccent }]}>
+                <Text style={[styles.cellValue, { color: "#4A90E2" }]}>
                   {windSpeedUnit === "kmh" && "km/h"}
                   {windSpeedUnit === "ms" && "m/s"}
                   {windSpeedUnit === "mph" && "mph"}
                 </Text>
-                <Text style={[styles.chevron, { color: colors.textTertiary }]}>›</Text>
+                <Text style={[styles.chevron, { color: textTertiary }]}>›</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -162,33 +163,35 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingTop: 35,
+    marginTop: 15,
+    paddingTop: 24,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 28,
   },
   sectionHeader: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 0.3,
-    marginLeft: 16,
-    marginBottom: 6,
+    letterSpacing: 0.8,
+    marginLeft: 20,
+    marginBottom: 8,
   },
   card: {
-    borderRadius: 12,
+    borderRadius: 16,
     marginHorizontal: 16,
     overflow: "hidden",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
     elevation: 1,
   },
   cell: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
   },
   cellLabel: {
     fontSize: 16,
@@ -197,25 +200,25 @@ const styles = StyleSheet.create({
   cellRight: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 10,
   },
   cellValue: {
     fontSize: 16,
     fontWeight: "400",
   },
   chevron: {
-    fontSize: 18,
-    fontWeight: "400",
-    marginTop: -1,
+    fontSize: 20,
+    fontWeight: "300",
+    marginTop: -2,
   },
   separator: {
     height: 0.5,
-    marginLeft: 16,
+    marginLeft: 18,
   },
   footerText: {
-    fontSize: 11,
-    marginLeft: 16,
-    marginTop: 6,
+    fontSize: 12,
+    marginLeft: 20,
+    marginTop: 8,
   },
   bottomSpacing: {
     height: 40,
