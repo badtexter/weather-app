@@ -13,6 +13,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAlerts, getCurrent, getForecast, getLocations, getSports } from "../api/weather";
+import { useAppTheme } from "../services/theme";
+import { useUnits } from "../services/units";
 import { getSavedLocation, saveSelectedLocation } from "../services/weatherNotifications";
 
 const { width } = Dimensions.get("window");
@@ -71,6 +73,29 @@ const getWeatherConfig = (condition: string): WeatherConfig => {
     glowColor1: "#B0BEC5",
     glowColor2: "#90A4AE",
   };
+};
+
+const translateCondition = (condition: string) => {
+  const conditionLower = condition.toLowerCase();
+
+  if (conditionLower.includes("sunny")) return "Słonecznie";
+  if (conditionLower.includes("clear")) return "Bezchmurnie";
+  if (conditionLower.includes("partly cloudy")) return "Częściowe zachmurzenie";
+  if (conditionLower.includes("cloudy") || conditionLower.includes("overcast")) return "Pochmurno";
+  if (conditionLower.includes("mist") || conditionLower.includes("fog")) return "Mgła";
+  if (conditionLower.includes("thunder")) return "Burza";
+  if (conditionLower.includes("snow")) return "Śnieg";
+  if (conditionLower.includes("sleet")) return "Deszcz ze śniegiem";
+  if (conditionLower.includes("rain") || conditionLower.includes("drizzle")) return "Deszcz";
+
+  return condition || "Brak danych";
+};
+
+const formatForecastDay = (date: string, index: number) => {
+  if (index === 0) return "Dzisiaj";
+  if (index === 1) return "Jutro";
+
+  return new Date(date).toLocaleDateString("pl-PL", { weekday: "long" });
 };
 
 // Color palette
@@ -251,17 +276,23 @@ const ForecastCard = ({
   high,
   low,
   icon,
+  selected,
+  onPress,
 }: {
   day: string;
-  temperature: number;
-  high: number;
-  low: number;
+  temperature: string;
+  high: string;
+  low: string;
   icon: any;
+  selected: boolean;
+  onPress: () => void;
 }) => (
-  <View
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.75}
     style={{
       width: 88,
-      backgroundColor: colors.card,
+      backgroundColor: selected ? colors.accent : colors.card,
       borderRadius: 20,
       paddingVertical: 18,
       alignItems: "center",
@@ -277,7 +308,7 @@ const ForecastCard = ({
       style={{
         fontSize: 14,
         fontWeight: "600",
-        color: colors.text.primary,
+        color: selected ? "#FFFFFF" : colors.text.primary,
         marginBottom: 4,
       }}
     >
@@ -287,30 +318,173 @@ const ForecastCard = ({
       style={{
         fontSize: 18,
         fontWeight: "700",
-        color: colors.accent,
+        color: selected ? "#FFFFFF" : colors.accent,
         marginBottom: 4,
       }}
     >
-      {temperature}°
+      {temperature}
     </Text>
     <Text
       style={{
         fontSize: 12,
-        color: colors.text.secondary,
+        color: selected ? "rgba(255,255,255,0.75)" : colors.text.secondary,
       }}
     >
-      {low}°
+      {low}
     </Text>
+  </TouchableOpacity>
+);
+
+const ForecastListRow = ({
+  day,
+  temperature,
+  high,
+  low,
+  icon,
+  selected,
+  onPress,
+}: {
+  day: string;
+  temperature: string;
+  high: string;
+  low: string;
+  icon: any;
+  selected: boolean;
+  onPress: () => void;
+}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.75}
+    style={{
+      backgroundColor: selected ? colors.search : "transparent",
+      borderRadius: 14,
+      paddingVertical: 13,
+      paddingHorizontal: 14,
+      marginBottom: 2,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    }}
+  >
+    <View style={{ flex: 1 }}>
+      <Text
+        style={{
+          fontSize: 17,
+          fontWeight: "600",
+          color: selected ? colors.accent : colors.text.primary,
+          textTransform: "capitalize",
+        }}
+      >
+        {day}
+      </Text>
+      <Text
+        style={{
+          fontSize: 13,
+          color: colors.text.secondary,
+          marginTop: 3,
+        }}
+      >
+        Min. {low} / maks. {high}
+      </Text>
+    </View>
+    <Image source={icon} style={{ width: 36, height: 36, marginHorizontal: 14 }} />
+    <Text
+      style={{
+        minWidth: 58,
+        textAlign: "right",
+        fontSize: 28,
+        fontWeight: "300",
+        color: selected ? colors.accent : colors.text.primary,
+        lineHeight: 32,
+      }}
+    >
+      {temperature}
+    </Text>
+  </TouchableOpacity>
+);
+
+const HourlyCard = ({
+  time,
+  temperature,
+  condition,
+  icon,
+  rainChance,
+}: {
+  time: string;
+  temperature: string;
+  condition: string;
+  icon: any;
+  rainChance?: number;
+}) => (
+  <View
+    style={{
+      width: 74,
+      minHeight: 112,
+      backgroundColor: colors.card,
+      borderRadius: 20,
+      paddingVertical: 12,
+      paddingHorizontal: 8,
+      alignItems: "center",
+      marginRight: 12,
+      ...shadows.small,
+    }}
+  >
+    <Text
+      style={{
+        fontSize: 13,
+        fontWeight: "600",
+        color: colors.text.primary,
+        marginBottom: 8,
+      }}
+    >
+      {time}
+    </Text>
+    <Image source={icon} style={{ width: 32, height: 32, marginBottom: 8 }} />
+    <Text
+      style={{
+        fontSize: 19,
+        fontWeight: "600",
+        color: colors.accent,
+      }}
+    >
+      {temperature}
+    </Text>
+    {typeof rainChance === "number" && rainChance > 0 && (
+      <Text
+        style={{
+          fontSize: 11,
+          color: colors.text.secondary,
+          marginTop: 4,
+        }}
+      >
+        {rainChance}%
+      </Text>
+    )}
   </View>
 );
 
 export default function Index() {
+  const { colors: themeColors, isDark } = useAppTheme();
+  const { formatTemperature, formatWindSpeed } = useUnits();
+  colors.background = themeColors.background;
+  colors.card = themeColors.card;
+  colors.search = themeColors.search;
+  colors.text.primary = themeColors.textPrimary;
+  colors.text.secondary = themeColors.textSecondary;
+  colors.text.tertiary = themeColors.border;
+  colors.accent = themeColors.accent;
+  colors.secondaryAccent = themeColors.secondaryAccent;
+  colors.shadow = themeColors.shadow;
+  shadows.small.shadowColor = themeColors.shadow;
+  shadows.medium.shadowColor = themeColors.shadow;
+
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Kalisz");
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [weatherData, setWeatherData] = useState<any | null>(null);
   const [forecastData, setForecastData] = useState<any | null>(null);
+  const [selectedForecastDayIndex, setSelectedForecastDayIndex] = useState(0);
   const [sportsData, setSportsData] = useState<any | null>(null);
   const [futureData, setFutureData] = useState<any | null>(null);
   const [alertsData, setAlertsData] = useState<any | null>(null);
@@ -393,6 +567,10 @@ export default function Index() {
     fetchWeather(selectedLocation);
   }, [preferencesLoaded, selectedLocation]);
 
+  useEffect(() => {
+    setSelectedForecastDayIndex(0);
+  }, [forecastData]);
+
   const fetchLocationSuggestions = async (query: string) => {
     if (!query.trim()) {
       setLocationOptions([
@@ -442,29 +620,54 @@ export default function Index() {
   const weatherInfo = [
     {
       icon: "speedometer-outline",
-      label: "Wind",
-      value: weatherData ? `${weatherData.current.wind_kph} km/h` : "–",
+      label: "Wiatr",
+      value: weatherData ? formatWindSpeed(weatherData.current.wind_kph) : "-",
     },
     {
       icon: "water-outline",
-      label: "Humidity",
-      value: weatherData ? `${weatherData.current.humidity}%` : "–",
+      label: "Wilgotność",
+      value: weatherData ? `${weatherData.current.humidity}%` : "-",
     },
     {
       icon: "eye-outline",
-      label: "Visibility",
-      value: weatherData ? `${weatherData.current.vis_km} km` : "–",
+      label: "Widoczność",
+      value: weatherData ? `${weatherData.current.vis_km} km` : "-",
     },
   ];
 
-  const forecast: Array<{ day: string; temperature: number; high: number; low: number; icon: any }> =
-    forecastData?.forecast?.forecastday?.map((day: any) => ({
-      day: new Date(day.date).toLocaleDateString("en-US", { weekday: "short" }),
-      temperature: Math.round(day.day.avgtemp_c),
-      high: Math.round(day.day.maxtemp_c),
-      low: Math.round(day.day.mintemp_c),
+  const forecast: Array<{
+    date: string;
+    day: string;
+    temperature: string;
+    high: string;
+    low: string;
+    icon: any;
+    hours: Array<{
+      time: string;
+      temperature: string;
+      condition: string;
+      icon: any;
+      rainChance?: number;
+    }>;
+  }> =
+    forecastData?.forecast?.forecastday?.map((day: any, index: number) => ({
+      date: day.date,
+      day: formatForecastDay(day.date, index),
+      temperature: formatTemperature(day.day.avgtemp_c),
+      high: formatTemperature(day.day.maxtemp_c),
+      low: formatTemperature(day.day.mintemp_c),
       icon: getWeatherConfig(day.day.condition.text).icon,
+      hours:
+        day.hour?.map((hour: any) => ({
+          time: hour.time?.split(" ")[1] || "",
+          temperature: formatTemperature(hour.temp_c),
+          condition: translateCondition(hour.condition?.text || ""),
+          icon: getWeatherConfig(hour.condition?.text || "Cloudy").icon,
+          rainChance: hour.chance_of_rain,
+        })) || [],
     })) || [];
+
+  const selectedForecastDay = forecast[selectedForecastDayIndex] || forecast[0];
 
   const handleLocationSelect = (location: { label: string; query: string }) => {
     setSelectedLocation(location.query);
@@ -476,10 +679,10 @@ export default function Index() {
 
   return (
     <LinearGradient
-      colors={["#F3F0FF", "#FFFFFF", "#EAF6FF"]}
+      colors={themeColors.gradient}
       style={{ flex: 1 }}
     >
-      <StatusBar style="dark" />
+      <StatusBar style={isDark ? "light" : "dark"} />
 
       <SafeAreaView style={{ flex: 1 }}>
         {/* Search Section */}
@@ -503,132 +706,86 @@ export default function Index() {
           contentContainerStyle={{ paddingVertical: 20 }}
           showsVerticalScrollIndicator={false}
         >
-          {/* Location & Temperature */}
-          <View style={{ alignItems: "center", marginBottom: 24 }}>
+          <View style={{ alignItems: "center", marginBottom: 16 }}>
             <Text
               style={{
                 fontSize: 34,
                 fontWeight: "500",
-                letterSpacing: -0.8,
-                color: colors.text.primary,
+                color: themeColors.textPrimary,
               }}
+              numberOfLines={1}
             >
               {selectedLocation}
             </Text>
             <Text
               style={{
                 fontSize: 16,
-                color: colors.text.secondary,
+                color: themeColors.textSecondary,
                 marginTop: 4,
-                fontWeight: "400", 
+                fontWeight: "400",
               }}
             >
               Polska
             </Text>
           </View>
 
-          {/* Weather Icon */}
-          <View
-            style={{
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 20,
-            }}
-          >
-            <View
+          <View style={{ alignItems: "center", marginBottom: 10 }}>
+            <Image
+              source={getWeatherConfig(weatherData?.current?.condition?.text || "Cloudy").icon}
+              resizeMode="contain"
               style={{
-                width: 200,
-                height: 200,
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
+                width: 150,
+                height: 150,
               }}
-            >
-              {(() => {
-                const weatherConfig = getWeatherConfig(
-                  weatherData?.current?.condition?.text || "Cloudy"
-                );
-                
-                return (
-                  <>
-                    {/* outer glow */}
-                    <View
-                      style={{
-                        position: "absolute",
-                        width: 180,
-                        height: 180,
-                        borderRadius: 90,
-                        backgroundColor: weatherConfig.glowColor1,
-                        opacity: 0.18,
-                      }}
-                    />
-
-                    {/* inner glow */}
-                    <View
-                      style={{
-                        position: "absolute",
-                        width: 130,
-                        height: 130,
-                        borderRadius: 65,
-                        backgroundColor: weatherConfig.glowColor2,
-                        opacity: 0.25,
-                      }}
-                    />
-
-                    <Image
-                      source={weatherConfig.icon}
-                      resizeMode="contain"
-                      style={{
-                        width: 160,
-                        height: 160,
-                      }}
-                    />
-                  </>
-                );
-              })()}
-            </View>
+            />
           </View>
 
-          {/* Temperature Display */}
-          <View
-            style={{
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 88,
-                fontWeight: "100",
-                color: colors.text.primary,
-                letterSpacing: -5,
-                lineHeight: 90,
-              }}
-            >
-              {weatherData ? `${Math.round(weatherData.current.temp_c)}°` : "--°"}
-            </Text>
+          <View style={{ alignItems: "center", marginBottom: 20 }}>
+            <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+              <Text
+                style={{
+                  fontSize: 72,
+                  fontWeight: "100",
+                  color: themeColors.textPrimary,
+                  lineHeight: 90,
+                }}
+              >
+                {formatTemperature(weatherData?.current?.temp_c)}
+              </Text>
 
+              <Text
+                style={{
+                  fontSize: 26,
+                  fontWeight: "400",
+                  color: themeColors.textPrimary,
+                  marginTop: 12,
+                  marginLeft: 2,
+                }}
+              >
+                
+              </Text>
+            </View>
             <Text
               style={{
                 fontSize: 17,
-                color: colors.text.secondary,
+                color: themeColors.textSecondary,
                 marginTop: 2,
                 fontWeight: "400",
-                letterSpacing: -0.2,
               }}
             >
-              {weatherData ? weatherData.current.condition.text : loading ? "Loading..." : "No data"}
+              {weatherData
+                ? translateCondition(weatherData.current.condition.text)
+                : loading
+                  ? "Ładowanie..."
+                  : "Brak danych"}
             </Text>
           </View>
 
-          {/* Weather Details Cards */}
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
               paddingHorizontal: 24,
-              marginTop: 28,
               marginBottom: 24,
             }}
           >
@@ -642,7 +799,7 @@ export default function Index() {
             ))}
           </View>
 
-          {/* 3-Day Forecast Section */}
+          {/* Daily Forecast Section */}
           <View
             style={{
               marginBottom: 28,
@@ -659,20 +816,86 @@ export default function Index() {
               <Ionicons
                 name="calendar-outline"
                 size={18}
-                color="#8E8E93"
+                color={themeColors.textSecondary}
               />
 
               <Text
                 style={{
                   fontSize: 20,
                   fontWeight: "500",
-                  color: colors.text.primary,
+                  color: themeColors.textPrimary,
                   marginLeft: 10,
                   letterSpacing: -0.3,
                 }}
               >
-                3-Day Forecast
+                Prognoza dzienna
               </Text>
+            </View>
+
+            <View
+              style={{
+                marginHorizontal: 24,
+                padding: 6,
+                borderRadius: 22,
+                backgroundColor: themeColors.card,
+                ...shadows.medium,
+              }}
+            >
+              {forecast.map((day, index) => (
+                <ForecastListRow
+                  key={index}
+                  day={day.day}
+                  temperature={day.temperature}
+                  high={day.high}
+                  low={day.low}
+                  icon={day.icon}
+                  selected={selectedForecastDayIndex === index}
+                  onPress={() => setSelectedForecastDayIndex(index)}
+                />
+              ))}
+            </View>
+          </View>
+
+          {/* Hourly Forecast Section */}
+          <View
+            style={{
+              marginBottom: 28,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: 24,
+                marginBottom: 16,
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons name="time-outline" size={18} color={themeColors.textSecondary} />
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: "500",
+                    color: themeColors.textPrimary,
+                    marginLeft: 10,
+                    letterSpacing: -0.3,
+                  }}
+                >
+                  Prognoza godzinowa
+                </Text>
+              </View>
+              {selectedForecastDay && (
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: themeColors.textSecondary,
+                    fontWeight: "500",
+                  }}
+                >
+                  {selectedForecastDay.day}
+                </Text>
+              )}
             </View>
 
             <ScrollView
@@ -681,14 +904,14 @@ export default function Index() {
               contentContainerStyle={{ paddingHorizontal: 24, paddingRight: 40 }}
               scrollEventThrottle={16}
             >
-              {forecast.map((day, index) => (
-                <ForecastCard
-                  key={index}
-                  day={day.day}
-                  temperature={day.temperature}
-                  high={day.high}
-                  low={day.low}
-                  icon={day.icon}
+              {selectedForecastDay?.hours?.map((hour, index) => (
+                <HourlyCard
+                  key={`${selectedForecastDay.date}-${hour.time}-${index}`}
+                  time={hour.time}
+                  temperature={hour.temperature}
+                  condition={hour.condition}
+                  icon={hour.icon}
+                  rainChance={hour.rainChance}
                 />
               ))}
             </ScrollView>
