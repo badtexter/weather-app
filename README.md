@@ -6,24 +6,30 @@ The app allows users to:
 
 * search for cities
 * check current weather conditions
-* view weekly forecasts
+* view 3-day forecasts
 * see additional weather details such as wind speed, humidity, and rain probability
+* change theme (light / dark mode)
+* receive notifications about current weather conditions
+* switch and customize preferred measurement units (temperature, wind speed, etc.)
 
 ## Tech Stack
 
 * React Native
 * Expo
-* JavaScript
-* OpenWeather API
+* OpenWeather API (Free)
 * Figma (UI Design)
 
 ## Features
 
 * Current weather information
-* 7-day forecast
+* 3-day forecast
 * City search
 * Dynamic weather icons
 * Responsive mobile UI
+* Weather details (wind speed, humidity, visibility, rain probability)
+* Location persistence (last selected city saved automatically)
+* Unit system switching (°C / °F, km/h / mph)
+* Dark / light theme support
 
 ## Installation
 
@@ -62,7 +68,3 @@ npx expo start
 * Sunrise icons created by Icon Hubs - https://www.flaticon.com/free-icons/sunrise
 * Sunset icons created by Icon Hubs - https://www.flaticon.com/free-icons/sunset
 * Pole icons created by Defamiravi Studio - https://www.flaticon.com/free-icons/botanic
-
-## Status
-
-Project in progress 🚀
