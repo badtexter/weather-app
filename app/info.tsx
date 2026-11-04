@@ -5,60 +5,66 @@ import { useAppTheme } from "../services/theme";
 export default function Info() {
   const { colors } = useAppTheme();
 
-  const cardStyle = [styles.card, { backgroundColor: colors.card, shadowColor: colors.shadow }];
-  const labelStyle = [styles.infoLabel, { color: colors.textSecondary }];
-  const valueStyle = [styles.infoValue, { color: colors.textPrimary }];
+  const rows = [
+    { label: "Autor", value: "Klaudia Pabin" },
+    {
+      label: "GitHub",
+      value: "@badtexter",
+      accent: true,
+      onPress: () => Linking.openURL("https://github.com/badtexter"),
+    },
+    { label: "System", value: "Android 14" },
+    { label: "Licencja", value: "MIT" },
+  ];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.ground }]}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        <View style={[styles.mainCard, { backgroundColor: colors.card, shadowColor: colors.shadow }]}>
+        <View style={[styles.mainPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[styles.appName, { color: colors.textPrimary }]}>SkyCheck</Text>
-          <Text style={[styles.appSubtitle, { color: colors.textSecondary }]}>Aplikacja Pogodowa</Text>
+          <Text style={[styles.appSubtitle, { color: colors.textSecondary }]}>Aplikacja pogodowa</Text>
 
           <View style={styles.versionContainer}>
-            <Text style={[styles.versionLabel, { color: colors.textSecondary }]}>Wersja</Text>
-            <Text style={[styles.versionValue, { color: colors.textPrimary }]}>1.0.1</Text>
+            <Text style={[styles.versionLabel, { color: colors.textTertiary }]}>Wersja</Text>
+            <Text style={[styles.versionValue, { color: colors.accent }]}>1.0.1</Text>
           </View>
         </View>
 
-        <View style={styles.infoGrid}>
-          <View style={cardStyle}>
-            <Text style={labelStyle}>Autor</Text>
-            <Text style={valueStyle}>Klaudia Pabin</Text>
-          </View>
-
-          <View style={cardStyle}>
-            <Text style={labelStyle}>GitHub</Text>
-            <Text
-              style={[styles.infoValue, { color: colors.secondaryAccent }]}
-              onPress={() => Linking.openURL("https://github.com/badtexter")}
+        <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Szczegóły</Text>
+        <View style={[styles.listPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          {rows.map((row, index) => (
+            <View
+              key={row.label}
+              style={[
+                styles.cell,
+                index < rows.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
+              ]}
             >
-              @badtexter
-            </Text>
-          </View>
-
-          <View style={cardStyle}>
-            <Text style={labelStyle}>System</Text>
-            <Text style={valueStyle}>Android 14</Text>
-          </View>
-
-          <View style={cardStyle}>
-            <Text style={labelStyle}>Licencja</Text>
-            <Text style={valueStyle}>MIT</Text>
-          </View>
+              <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>{row.label}</Text>
+              <Text
+                style={[
+                  styles.cellValue,
+                  { color: row.accent ? colors.accent : colors.textSecondary },
+                ]}
+                onPress={row.onPress}
+              >
+                {row.value}
+              </Text>
+            </View>
+          ))}
         </View>
 
-        <View style={[styles.licenseCard, { backgroundColor: colors.card, shadowColor: colors.shadow }]}>
+        <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Licencja</Text>
+        <View style={[styles.licensePanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.licenseHeader}>
-            <View style={[styles.licenseDot, { backgroundColor: colors.secondaryAccent }]} />
+            <View style={[styles.licenseDot, { backgroundColor: colors.accent }]} />
             <Text style={[styles.licenseTitle, { color: colors.textPrimary }]}>MIT License</Text>
           </View>
-          <Text style={[styles.licenseYear, { color: colors.textSecondary }]}>
+          <Text style={[styles.licenseYear, { color: colors.textTertiary }]}>
             Copyright © 2026 Klaudia Pabin
           </Text>
           <Text style={[styles.licenseText, { color: colors.textSecondary }]}>
@@ -70,20 +76,20 @@ export default function Info() {
             furnished to do so, subject to the following conditions.
           </Text>
           <View style={[styles.licenseTags, { borderTopColor: colors.border }]}>
-            <Text style={[styles.tag, { color: colors.secondaryAccent, backgroundColor: colors.border }]}>
+            <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
               Open Source
             </Text>
-            <Text style={[styles.tag, { color: colors.secondaryAccent, backgroundColor: colors.border }]}>
+            <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
               Free Use
             </Text>
-            <Text style={[styles.tag, { color: colors.secondaryAccent, backgroundColor: colors.border }]}>
+            <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
               MIT
             </Text>
           </View>
         </View>
 
         <Text
-          style={[styles.link, { color: colors.secondaryAccent }]}
+          style={[styles.link, { color: colors.accent }]}
           onPress={() => Linking.openURL("https://opensource.org/licenses/MIT")}
         >
           opensource.org/licenses/MIT →
@@ -95,6 +101,8 @@ export default function Info() {
   );
 }
 
+const RADIUS = 8;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -103,76 +111,70 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    marginTop: 15,
     paddingHorizontal: 20,
-    paddingTop: 35,
+    paddingTop: 24,
   },
-  mainCard: {
-    borderRadius: 28,
-    padding: 28,
-    marginBottom: 20,
+  mainPanel: {
+    borderRadius: RADIUS,
+    borderWidth: 1,
+    padding: 24,
+    marginBottom: 24,
     alignItems: "center",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
   },
   appName: {
-    fontSize: 28,
-    fontWeight: "500",
+    fontSize: 24,
+    fontFamily: "DMSans_600SemiBold",
     marginBottom: 4,
   },
   appSubtitle: {
     fontSize: 14,
-    fontWeight: "400",
-    marginBottom: 24,
+    fontFamily: "DMSans_400Regular",
+    marginBottom: 20,
   },
   versionContainer: {
     alignItems: "center",
   },
   versionLabel: {
     fontSize: 12,
+    fontFamily: "DMSans_500Medium",
     marginBottom: 4,
   },
   versionValue: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 16,
+    fontFamily: "DMSans_700Bold",
   },
-  infoGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  card: {
-    borderRadius: 20,
-    padding: 18,
-    width: "48%",
-    marginBottom: 12,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  infoLabel: {
-    fontSize: 11,
-    fontWeight: "500",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
+  sectionHeader: {
+    fontSize: 13,
+    fontFamily: "DMSans_500Medium",
+    marginLeft: 4,
     marginBottom: 8,
   },
-  infoValue: {
-    fontSize: 15,
-    fontWeight: "500",
+  listPanel: {
+    borderRadius: RADIUS,
+    borderWidth: 1,
+    marginBottom: 24,
+    overflow: "hidden",
   },
-  licenseCard: {
-    borderRadius: 20,
-    padding: 20,
+  cell: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  cellLabel: {
+    fontSize: 15,
+    fontFamily: "DMSans_400Regular",
+  },
+  cellValue: {
+    fontSize: 15,
+    fontFamily: "DMSans_400Regular",
+  },
+  licensePanel: {
+    borderRadius: RADIUS,
+    borderWidth: 1,
+    padding: 18,
     marginBottom: 20,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
   },
   licenseHeader: {
     flexDirection: "row",
@@ -180,22 +182,24 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   licenseDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     marginRight: 8,
   },
   licenseTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 15,
+    fontFamily: "DMSans_600SemiBold",
   },
   licenseYear: {
     fontSize: 13,
+    fontFamily: "DMSans_400Regular",
     marginBottom: 14,
-    marginLeft: 16,
+    marginLeft: 14,
   },
   licenseText: {
     fontSize: 12,
+    fontFamily: "DMSans_400Regular",
     lineHeight: 18,
     marginBottom: 16,
   },
@@ -203,18 +207,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    paddingTop: 8,
+    paddingTop: 12,
     borderTopWidth: 1,
   },
   tag: {
     fontSize: 11,
-    paddingHorizontal: 12,
+    fontFamily: "DMSans_500Medium",
+    paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 14,
+    borderRadius: 999,
     overflow: "hidden",
   },
   link: {
     fontSize: 13,
+    fontFamily: "DMSans_400Regular",
     textAlign: "center",
     paddingVertical: 8,
   },

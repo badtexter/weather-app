@@ -1,10 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { BlurView } from "expo-blur";
-import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Dimensions,
+  ActivityIndicator,
   Image,
   ScrollView,
   Text,
@@ -25,9 +23,41 @@ import {
   saveSelectedLocation,
 } from "../services/weatherNotifications";
 
-const { width } = Dimensions.get("window");
+const RADIUS = 8;
 
-const getWeatherIcon = (condition: string) => {
+export type WeatherCondition = { text: string };
+
+export type CurrentWeatherResponse = {
+  current: {
+    temp_c: number;
+    humidity: number;
+    vis_km: number;
+    wind_kph: number;
+    condition: WeatherCondition;
+  };
+};
+
+export type ForecastResponse = {
+  forecast: {
+    forecastday: Array<{
+      date: string;
+      day: {
+        avgtemp_c: number;
+        maxtemp_c: number;
+        mintemp_c: number;
+        condition: WeatherCondition;
+      };
+      hour: Array<{
+        time: string;
+        temp_c: number;
+        condition?: WeatherCondition;
+        chance_of_rain: number;
+      }>;
+    }>;
+  };
+};
+
+export const getWeatherIcon = (condition: string) => {
   const conditionLower = condition.toLowerCase();
 
   if (conditionLower.includes("sunny") || conditionLower.includes("clear")) {
@@ -47,7 +77,7 @@ const getWeatherIcon = (condition: string) => {
   return require("../assets/images/icons/cloudy-day.png");
 };
 
-const translateCondition = (condition: string) => {
+export const translateCondition = (condition: string) => {
   const conditionLower = condition.toLowerCase();
 
   if (conditionLower.includes("sunny")) return "Słonecznie";
@@ -63,7 +93,7 @@ const translateCondition = (condition: string) => {
   return condition || "Brak danych";
 };
 
-const formatForecastDay = (date: string, index: number) => {
+export const formatForecastDay = (date: string, index: number) => {
   if (index === 0) return "Dzisiaj";
   if (index === 1) return "Jutro";
   return new Date(date).toLocaleDateString("pl-PL", { weekday: "long" });
@@ -78,7 +108,7 @@ const SearchBar = ({
   showResults,
   locations,
   onSelectLocation,
-  isDark,
+  colors,
 }: {
   value: string;
   onChangeText: (text: string) => void;
@@ -87,139 +117,138 @@ const SearchBar = ({
   showResults: boolean;
   locations: Array<{ label: string; query: string }>;
   onSelectLocation: (location: { label: string; query: string }) => void;
-  isDark: boolean;
+  colors: any;
 }) => (
   <View style={{ position: "relative", zIndex: 50, paddingHorizontal: 20, marginTop: 8 }}>
-    <BlurView
-      intensity={80}
-      tint={isDark ? "dark" : "light"}
+    <View
       style={{
-        borderRadius: 28,
-        overflow: "hidden",
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: colors.surface,
+        borderRadius: RADIUS,
+        borderWidth: 1,
+        borderColor: colors.border,
+        paddingHorizontal: 14,
+        height: 44,
       }}
     >
-      <View
+      <Ionicons name="search" size={17} color={colors.textSecondary} />
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        placeholder="Wyszukaj miasto"
+        placeholderTextColor={colors.textTertiary}
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: isDark ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.7)",
-          paddingHorizontal: 16,
-          height: 52,
+          marginLeft: 10,
+          flex: 1,
+          fontSize: 15,
+          fontFamily: "DMSans_400Regular",
+          color: colors.textPrimary,
         }}
-      >
-        <Ionicons name="search" size={20} color={isDark ? "white" : "#333"} />
-        <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          placeholder="Wyszukaj miasto"
-          placeholderTextColor={isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)"}
-          style={{
-            marginLeft: 12,
-            flex: 1,
-            fontSize: 16,
-            color: isDark ? "white" : "#111",
-          }}
-        />
-      </View>
-    </BlurView>
+      />
+    </View>
 
     {showResults && locations.length > 0 && (
-      <BlurView
-        intensity={90}
-        tint={isDark ? "dark" : "light"}
+      <View
         style={{
           position: "absolute",
-          top: 60,
+          top: 50,
           left: 20,
           right: 20,
-          borderRadius: 20,
+          borderRadius: RADIUS,
+          borderWidth: 1,
+          borderColor: colors.border,
           overflow: "hidden",
           zIndex: 100,
+          backgroundColor: colors.raised,
         }}
       >
-        <View style={{ backgroundColor: isDark ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.8)" }}>
-          {locations.map((location, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => onSelectLocation(location)}
-              activeOpacity={0.7}
-              style={{
-                paddingVertical: 14,
-                paddingHorizontal: 16,
-                borderBottomWidth: index < locations.length - 1 ? 0.5 : 0,
-                borderBottomColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
-              }}
-            >
-              <Text style={{ fontSize: 15, color: isDark ? "white" : "#111" }}>
-                {location.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </BlurView>
+        {locations.map((location, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => onSelectLocation(location)}
+            activeOpacity={0.7}
+            style={{
+              paddingVertical: 13,
+              paddingHorizontal: 14,
+              borderBottomWidth: index < locations.length - 1 ? 1 : 0,
+              borderBottomColor: colors.border,
+            }}
+          >
+            <Text style={{ fontSize: 14, fontFamily: "DMSans_400Regular", color: colors.textPrimary }}>
+              {location.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     )}
   </View>
 );
 
-// Info Card
-const InfoCard = ({
-  icon,
-  label,
-  value,
-  isDark,
+// A single strip holding the three current-conditions figures, split by 1px rules —
+// one KPI container rather than three separate tiles.
+const ConditionStrip = ({
+  items,
+  colors,
 }: {
-  icon: string;
-  label: string;
-  value: string;
-  isDark: boolean;
+  items: Array<{ icon: string; label: string; value: string }>;
+  colors: any;
 }) => (
-  <BlurView
-    intensity={70}
-    tint={isDark ? "dark" : "light"}
+  <View
     style={{
-      flex: 1,
-      borderRadius: 24,
+      flexDirection: "row",
+      borderRadius: RADIUS,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
       overflow: "hidden",
-      marginHorizontal: 6,
     }}
   >
-    <View
-      style={{
-        backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.5)",
-        paddingVertical: 16,
-        alignItems: "center",
-      }}
-    >
-      <Ionicons name={icon as any} size={22} color={isDark ? "white" : "#333"} />
-      <Text
+    {items.map((item, index) => (
+      <View
+        key={item.label}
         style={{
-          fontSize: 11,
-          fontWeight: "500",
-          color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.5)",
-          marginTop: 8,
-          letterSpacing: 0.5,
+          flex: 1,
+          paddingVertical: 14,
+          paddingHorizontal: 10,
+          alignItems: "flex-start",
+          borderLeftWidth: index === 0 ? 0 : 1,
+          borderLeftColor: colors.border,
         }}
       >
-        {label}
-      </Text>
-      <Text
-        style={{
-          fontSize: 18,
-          fontWeight: "600",
-          color: isDark ? "white" : "#111",
-          marginTop: 4,
-        }}
-      >
-        {value}
-      </Text>
-    </View>
-  </BlurView>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Ionicons name={item.icon as any} size={13} color={colors.textTertiary} />
+          <Text
+            style={{
+              fontSize: 11,
+              fontFamily: "DMSans_500Medium",
+              color: colors.textTertiary,
+              marginLeft: 4,
+            }}
+          >
+            {item.label}
+          </Text>
+        </View>
+        <Text
+          style={{
+            fontSize: 17,
+            fontFamily: "DMSans_500Medium",
+            color: colors.textPrimary,
+            marginTop: 6,
+          }}
+        >
+          {item.value}
+        </Text>
+      </View>
+    ))}
+  </View>
 );
 
-// Forecast Card
-const ForecastCard = ({
+// Forecast row — the pale tint of the accent fills the selected row (the
+// style's one move for area work); the full hue stays reserved for the figure.
+const ForecastRow = ({
   day,
   temperature,
   high,
@@ -227,7 +256,8 @@ const ForecastCard = ({
   icon,
   selected,
   onPress,
-  isDark,
+  isLast,
+  colors,
 }: {
   day: string;
   temperature: string;
@@ -236,174 +266,258 @@ const ForecastCard = ({
   icon: any;
   selected: boolean;
   onPress: () => void;
-  isDark: boolean;
+  isLast: boolean;
+  colors: any;
 }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-    <BlurView
-      intensity={selected ? 90 : 50}
-      tint={isDark ? "dark" : "light"}
+    <View
       style={{
-        borderRadius: 20,
-        overflow: "hidden",
-        marginBottom: 8,
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 13,
+        paddingHorizontal: 14,
+        borderBottomWidth: isLast ? 0 : 1,
+        borderBottomColor: colors.border,
+        backgroundColor: selected ? colors.raised : "transparent",
       }}
     >
-      <View
-        style={{
-          backgroundColor: selected 
-            ? isDark ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.8)"
-            : isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.3)",
-          paddingVertical: 12,
-          paddingHorizontal: 16,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: selected ? "600" : "400",
-              color: isDark ? "white" : "#111",
-            }}
-          >
-            {day}
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)",
-              marginTop: 2,
-            }}
-          >
-            {low} / {high}
-          </Text>
-        </View>
-        <Image source={icon} style={{ width: 32, height: 32, marginHorizontal: 12 }} />
+      <View style={{ flex: 1 }}>
         <Text
           style={{
-            fontSize: 22,
-            fontWeight: selected ? "600" : "300",
-            color: isDark ? "white" : "#111",
+            fontSize: 15,
+            fontFamily: selected ? "DMSans_600SemiBold" : "DMSans_400Regular",
+            color: selected ? colors.accentInk : colors.textPrimary,
           }}
         >
-          {temperature}
+          {day}
+        </Text>
+        <Text
+          style={{
+            fontSize: 12,
+            fontFamily: "DMSans_500Medium",
+            color: colors.textTertiary,
+            marginTop: 2,
+          }}
+        >
+          {low} / {high}
         </Text>
       </View>
-    </BlurView>
+      <Image source={icon} style={{ width: 26, height: 26, marginHorizontal: 12 }} />
+      <Text
+        style={{
+          fontSize: 18,
+          fontFamily: "DMSans_700Bold",
+          color: selected ? colors.accent : colors.textPrimary,
+          minWidth: 50,
+          textAlign: "right",
+        }}
+      >
+        {temperature}
+      </Text>
+    </View>
   </TouchableOpacity>
 );
 
-// Hourly Card
-const HourlyCard = ({
+// Hourly Row
+const HourlyRow = ({
   time,
   temperature,
   icon,
   rainChance,
-  isDark,
+  isLast,
+  colors,
 }: {
   time: string;
   temperature: string;
   icon: any;
   rainChance?: number;
-  isDark: boolean;
+  isLast: boolean;
+  colors: any;
 }) => (
-  <BlurView
-    intensity={60}
-    tint={isDark ? "dark" : "light"}
+  <View
     style={{
-      width: 80,
-      borderRadius: 24,
-      overflow: "hidden",
-      marginRight: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      borderBottomWidth: isLast ? 0 : 1,
+      borderBottomColor: colors.border,
     }}
   >
-    <View
+    <Text
       style={{
-        backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.5)",
-        paddingVertical: 12,
-        alignItems: "center",
+        width: 52,
+        fontSize: 13,
+        fontFamily: "DMSans_500Medium",
+        color: colors.textSecondary,
       }}
     >
-      <Text
-        style={{
-          fontSize: 13,
-          fontWeight: "500",
-          color: isDark ? "white" : "#333",
-          marginBottom: 8,
-        }}
-      >
-        {time}
-      </Text>
-      <Image source={icon} style={{ width: 32, height: 32, marginBottom: 8 }} />
-      <Text
-        style={{
-          fontSize: 20,
-          fontWeight: "600",
-          color: isDark ? "white" : "#111",
-        }}
-      >
-        {temperature}
-      </Text>
-      {typeof rainChance === "number" && rainChance > 0 && (
-        <Text
+      {time}
+    </Text>
+    <Image source={icon} style={{ width: 24, height: 24, marginHorizontal: 14 }} />
+    <View style={{ flex: 1 }}>
+      {typeof rainChance === "number" && rainChance > 0 ? (
+        <View
           style={{
-            fontSize: 10,
-            fontWeight: "500",
-            color: isDark ? "#90CAF9" : "#1565C0",
-            marginTop: 4,
+            flexDirection: "row",
+            alignItems: "center",
+            alignSelf: "flex-start",
+            backgroundColor: colors.raised,
+            borderRadius: 999,
+            paddingVertical: 3,
+            paddingHorizontal: 8,
           }}
         >
-          {rainChance}%
-        </Text>
-      )}
+          <Ionicons name="water" size={11} color={colors.accentInk} style={{ marginRight: 3 }} />
+          <Text
+            style={{
+              fontSize: 12,
+              fontFamily: "DMSans_500Medium",
+              color: colors.accentInk,
+            }}
+          >
+            {rainChance}%
+          </Text>
+        </View>
+      ) : null}
     </View>
-  </BlurView>
+    <Text
+      style={{
+        fontSize: 15,
+        fontFamily: "DMSans_700Bold",
+        color: colors.textPrimary,
+        minWidth: 46,
+        textAlign: "right",
+      }}
+    >
+      {temperature}
+    </Text>
+  </View>
+);
+
+// Shown on first load, before any weather has ever arrived for this location.
+const LoadingState = ({ colors }: { colors: any }) => (
+  <View style={{ alignItems: "center", paddingHorizontal: 32, marginTop: 60 }}>
+    <ActivityIndicator size="large" color={colors.accent} />
+    <Text
+      style={{
+        fontSize: 14,
+        fontFamily: "DMSans_400Regular",
+        color: colors.textSecondary,
+        marginTop: 14,
+      }}
+    >
+      Ładowanie pogody…
+    </Text>
+  </View>
+);
+
+// Shown when the fetch failed outright — distinct from "no data yet" and
+// from a successful response with nothing interesting in it.
+const ErrorState = ({
+  message,
+  onRetry,
+  colors,
+}: {
+  message: string;
+  onRetry: () => void;
+  colors: any;
+}) => (
+  <View style={{ alignItems: "center", paddingHorizontal: 32, marginTop: 40 }}>
+    <Ionicons name="cloud-offline-outline" size={36} color={colors.textTertiary} />
+    <Text
+      style={{
+        fontSize: 16,
+        fontFamily: "DMSans_600SemiBold",
+        color: colors.textPrimary,
+        marginTop: 14,
+        textAlign: "center",
+      }}
+    >
+      Nie udało się pobrać pogody
+    </Text>
+    <Text
+      style={{
+        fontSize: 14,
+        fontFamily: "DMSans_400Regular",
+        color: colors.textSecondary,
+        marginTop: 6,
+        textAlign: "center",
+        lineHeight: 20,
+      }}
+    >
+      {message}
+    </Text>
+    <TouchableOpacity
+      onPress={onRetry}
+      activeOpacity={0.8}
+      style={{
+        marginTop: 20,
+        backgroundColor: colors.accent,
+        borderRadius: RADIUS,
+        paddingVertical: 10,
+        paddingHorizontal: 22,
+      }}
+    >
+      <Text style={{ fontSize: 14, fontFamily: "DMSans_600SemiBold", color: "#FFFFFF" }}>
+        Spróbuj ponownie
+      </Text>
+    </TouchableOpacity>
+  </View>
 );
 
 export default function Index() {
-  const { isDark } = useAppTheme();
+  const { isDark, colors } = useAppTheme();
   const { formatTemperature, formatWindSpeed } = useUnits();
 
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Kalisz");
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
-  const [weatherData, setWeatherData] = useState<any | null>(null);
-  const [forecastData, setForecastData] = useState<any | null>(null);
+  const [weatherData, setWeatherData] = useState<CurrentWeatherResponse | null>(null);
+  const [forecastData, setForecastData] = useState<ForecastResponse | null>(null);
   const [selectedForecastDayIndex, setSelectedForecastDayIndex] = useState(0);
   const [locationOptions, setLocationOptions] = useState<
     Array<{ label: string; query: string }>
   >([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchWeather = async (location: string) => {
     setLoading(true);
-    try {
-      const [currentResult, forecastResult] = await Promise.allSettled([
-        getCurrent({ cityName: location, includeAqi: "yes" }),
-        getForecast({
-          cityName: location,
-          days: 3,
-          includeAqi: "yes",
-          includeAlerts: "no",
-        }),
-      ]);
+    setError(null);
 
-      if (currentResult.status === "fulfilled") {
-        setWeatherData(currentResult.value);
-      }
-      if (forecastResult.status === "fulfilled") {
-        setForecastData(forecastResult.value);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+    const [currentResult, forecastResult] = await Promise.allSettled([
+      getCurrent({ cityName: location, includeAqi: "yes" }),
+      getForecast({
+        cityName: location,
+        days: 3,
+        includeAqi: "yes",
+        includeAlerts: "no",
+      }),
+    ]);
+
+    if (currentResult.status === "fulfilled") {
+      setWeatherData(currentResult.value);
+    } else {
+      console.error(currentResult.reason);
+      setWeatherData(null);
     }
+
+    if (forecastResult.status === "fulfilled") {
+      setForecastData(forecastResult.value);
+    } else {
+      console.error(forecastResult.reason);
+      setForecastData(null);
+    }
+
+    if (currentResult.status === "rejected") {
+      setError(`Nie udało się pobrać pogody dla „${location}”. Sprawdź nazwę miasta i połączenie z internetem.`);
+    }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -460,23 +574,23 @@ export default function Index() {
   const weatherInfo = [
     {
       icon: "speedometer-outline",
-      label: "WIATR",
-      value: weatherData ? formatWindSpeed(weatherData.current.wind_kph) : "-",
+      label: "Wiatr",
+      value: weatherData ? formatWindSpeed(weatherData.current.wind_kph) : "–",
     },
     {
       icon: "water-outline",
-      label: "WILGOTNOŚĆ",
-      value: weatherData ? `${weatherData.current.humidity}%` : "-",
+      label: "Wilgotność",
+      value: weatherData ? `${weatherData.current.humidity}%` : "–",
     },
     {
       icon: "eye-outline",
-      label: "WIDOCZNOŚĆ",
-      value: weatherData ? `${weatherData.current.vis_km} km` : "-",
+      label: "Widoczność",
+      value: weatherData ? `${weatherData.current.vis_km} km` : "–",
     },
   ];
 
   const forecast =
-    forecastData?.forecast?.forecastday?.map((day: any, index: number) => ({
+    forecastData?.forecast?.forecastday?.map((day, index) => ({
       date: day.date,
       day: formatForecastDay(day.date, index),
       temperature: formatTemperature(day.day.avgtemp_c),
@@ -484,7 +598,7 @@ export default function Index() {
       low: formatTemperature(day.day.mintemp_c),
       icon: getWeatherIcon(day.day.condition.text),
       hours:
-        day.hour?.map((hour: any) => ({
+        day.hour?.map((hour) => ({
           time: hour.time?.split(" ")[1] || "",
           temperature: formatTemperature(hour.temp_c),
           icon: getWeatherIcon(hour.condition?.text || "Cloudy"),
@@ -501,22 +615,8 @@ export default function Index() {
     setLocationOptions([]);
   };
 
-  // Kolory tekstu w zależności od trybu
-  const textColor = isDark ? "white" : "#111";
-  const textSecondary = isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.5)";
-  const textTertiary = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)";
-
   return (
-    <LinearGradient
-      colors={isDark 
-        ? ["#0B1020", "#1B2A49", "#243B63", "#3E5C8A"]
-        : ["#E8F0FE", "#D4E4FC", "#C0D8FA", "#ACCCF8"]
-      }
-      locations={[0, 0.3, 0.7, 1]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={{ flex: 1 }}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.ground }}>
       <StatusBar style={isDark ? "light" : "dark"} />
 
       <SafeAreaView style={{ flex: 1 }}>
@@ -528,131 +628,141 @@ export default function Index() {
           showResults={showSearch}
           locations={locationOptions}
           onSelectLocation={handleLocationSelect}
-          isDark={isDark}
+          colors={colors}
         />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 40 }}
         >
-          {/* Location */}
-          <View style={{ alignItems: "center", marginTop: 20, marginBottom: 8 }}>
-            <Text
-              style={{
-                fontSize: 38,
-                fontWeight: "500",
-                color: textColor,
-                letterSpacing: -0.3,
-              }}
-              numberOfLines={1}
-            >
-              {selectedLocation}
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                color: textSecondary,
-                marginTop: 2,
-              }}
-            >
-              Polska
-            </Text>
-          </View>
-
-          {/* Weather Icon */}
-          <View style={{ alignItems: "center", marginVertical: 16 }}>
-            <Image
-              source={getWeatherIcon(weatherData?.current?.condition?.text || "Cloudy")}
-              style={{ width: 130, height: 130 }}
-              resizeMode="contain"
-            />
-          </View>
-
-          {/* Temperature */}
-          <View style={{ alignItems: "center" }}>
-            <Text
-              style={{
-                fontSize: 72,
-                fontWeight: "200",
-                color: textColor,
-                letterSpacing: -2,
-              }}
-            >
-              {formatTemperature(weatherData?.current?.temp_c)}
-            </Text>
-            <Text
-              style={{
-                fontSize: 17,
-                fontWeight: "500",
-                color: textSecondary,
-                marginTop: 6,
-              }}
-            >
-              {weatherData
-                ? translateCondition(weatherData.current.condition.text)
-                : loading ? "Ładowanie..." : "Brak danych"}
-            </Text>
-          </View>
-
-          {/* Info Cards */}
-          <View style={{ flexDirection: "row", paddingHorizontal: 20, marginTop: 32 }}>
-            {weatherInfo.map((info, index) => (
-              <InfoCard key={index} icon={info.icon} label={info.label} value={info.value} isDark={isDark} />
-            ))}
-          </View>
-
-          {/* Daily Forecast */}
-          <View style={{ marginTop: 36, paddingHorizontal: 20 }}>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: textColor, marginBottom: 12, letterSpacing: -0.3 }}>
-              Prognoza dzienna
-            </Text>
-            {forecast.map((day, index) => (
-              <ForecastCard
-                key={index}
-                day={day.day}
-                temperature={day.temperature}
-                high={day.high}
-                low={day.low}
-                icon={day.icon}
-                selected={selectedForecastDayIndex === index}
-                onPress={() => setSelectedForecastDayIndex(index)}
-                isDark={isDark}
-              />
-            ))}
-          </View>
-
-          {/* Hourly Forecast */}
-          <View style={{ marginTop: 28, marginBottom: 20 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, marginBottom: 12 }}>
-              <Text style={{ fontSize: 18, fontWeight: "600", color: textColor, letterSpacing: -0.3 }}>
-                Prognoza godzinowa
+          {/* Hero: location, icon and temperature */}
+          <View style={{ alignItems: "center", marginTop: 20 }}>
+            {/* Location */}
+            <View style={{ alignItems: "center", marginBottom: 8 }}>
+              <Text
+                style={{
+                  fontSize: 36,
+                  fontFamily: "DMSans_600SemiBold",
+                  color: colors.textPrimary,
+                }}
+                numberOfLines={1}
+              >
+                {selectedLocation}
               </Text>
-              {selectedForecastDay && (
-                <Text style={{ fontSize: 14, color: textSecondary }}>
-                  {selectedForecastDay.day}
-                </Text>
-              )}
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontFamily: "DMSans_400Regular",
+                  color: colors.textTertiary,
+                  marginTop: 3,
+                }}
+              >
+                Polska
+              </Text>
             </View>
 
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingLeft: 20, paddingRight: 40 }}
-            >
-              {selectedForecastDay?.hours?.map((hour, index) => (
-                <HourlyCard
-                  key={index}
-                  time={hour.time}
-                  temperature={hour.temperature}
-                  icon={hour.icon}
-                  rainChance={hour.rainChance}
-                  isDark={isDark}
-                />
-              ))}
-            </ScrollView>
+            {!error && weatherData && (
+              <>
+                {/* Weather Icon */}
+                <View style={{ marginVertical: 12 }}>
+                  <Image
+                    source={getWeatherIcon(weatherData.current.condition.text)}
+                    style={{ width: 160, height: 160 }}
+                    resizeMode="contain"
+                  />
+                </View>
+
+                {/* Temperature */}
+                <View style={{ alignItems: "center" }}>
+                  <Text
+                    style={{
+                      fontSize: 88,
+                      fontFamily: "DMSans_700Bold",
+                      color: colors.accent,
+                    }}
+                  >
+                    {formatTemperature(weatherData.current.temp_c)}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      fontFamily: "DMSans_500Medium",
+                      color: colors.textSecondary,
+                      marginTop: 4,
+                    }}
+                  >
+                    {translateCondition(weatherData.current.condition.text)}
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
+
+          {error ? (
+            <ErrorState message={error} onRetry={() => fetchWeather(selectedLocation)} colors={colors} />
+          ) : loading && !weatherData ? (
+            <LoadingState colors={colors} />
+          ) : weatherData ? (
+            <>
+              {/* Current conditions */}
+              <View style={{ paddingHorizontal: 20, marginTop: 28 }}>
+                <ConditionStrip items={weatherInfo} colors={colors} />
+              </View>
+
+              {/* Daily Forecast */}
+              <View style={{ marginTop: 28, paddingHorizontal: 20 }}>
+                <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary, marginBottom: 8 }}>
+                  Prognoza dzienna
+                </Text>
+                <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
+                  {forecast.map((day, index) => (
+                    <ForecastRow
+                      key={index}
+                      day={day.day}
+                      temperature={day.temperature}
+                      high={day.high}
+                      low={day.low}
+                      icon={day.icon}
+                      selected={selectedForecastDayIndex === index}
+                      onPress={() => setSelectedForecastDayIndex(index)}
+                      isLast={index === forecast.length - 1}
+                      colors={colors}
+                    />
+                  ))}
+                </View>
+              </View>
+
+              {/* Hourly Forecast */}
+              <View style={{ marginTop: 24, marginBottom: 20, paddingHorizontal: 20 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+                  <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary }}>
+                    Prognoza godzinowa
+                  </Text>
+                  {selectedForecastDay && (
+                    <Text style={{ fontSize: 12, fontFamily: "DMSans_400Regular", color: colors.textTertiary }}>
+                      {selectedForecastDay.day}
+                    </Text>
+                  )}
+                </View>
+
+                <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
+                  {selectedForecastDay?.hours?.map((hour, index) => (
+                    <HourlyRow
+                      key={index}
+                      time={hour.time}
+                      temperature={hour.temperature}
+                      icon={hour.icon}
+                      rainChance={hour.rainChance}
+                      isLast={index === selectedForecastDay.hours.length - 1}
+                      colors={colors}
+                    />
+                  ))}
+                </View>
+              </View>
+            </>
+          ) : null}
         </ScrollView>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
