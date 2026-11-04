@@ -10,7 +10,6 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Svg, { Defs, RadialGradient, Stop, Rect } from "react-native-svg";
 import {
   getCurrent,
   getForecast,
@@ -43,38 +42,6 @@ const getWeatherIcon = (condition: string) => {
   }
 
   return require("../assets/images/icons/cloudy-day.png");
-};
-
-// The icon set is itself soft gradient art — a tint to match for a glow behind it.
-const getConditionTint = (condition: string) => {
-  const conditionLower = condition.toLowerCase();
-
-  if (conditionLower.includes("sunny") || conditionLower.includes("clear")) return "255,176,64";
-  if (conditionLower.includes("thunder") || conditionLower.includes("storm")) return "150,120,235";
-  if (conditionLower.includes("snow")) return "140,195,255";
-  if (conditionLower.includes("rain") || conditionLower.includes("drizzle")) return "70,140,230";
-  if (conditionLower.includes("fog") || conditionLower.includes("mist")) return "170,176,195";
-
-  return "110,150,220";
-};
-
-// A soft radial glow behind a weather icon, the condition's own tint fading
-// smoothly to nothing — a real SVG radial gradient, not a stack of flat rings,
-// so it has no visible banding at any size.
-const Glow = ({ size, tint, peak = 0.3 }: { size: number; tint: string; peak?: number }) => {
-  const id = React.useId().replace(/:/g, "");
-  return (
-    <Svg width={size} height={size} style={{ position: "absolute" }}>
-      <Defs>
-        <RadialGradient id={id} cx="50%" cy="50%" r="50%">
-          <Stop offset="0%" stopColor={`rgb(${tint})`} stopOpacity={peak} />
-          <Stop offset="55%" stopColor={`rgb(${tint})`} stopOpacity={peak * 0.4} />
-          <Stop offset="100%" stopColor={`rgb(${tint})`} stopOpacity={0} />
-        </RadialGradient>
-      </Defs>
-      <Rect width={size} height={size} fill={`url(#${id})`} />
-    </Svg>
-  );
 };
 
 const translateCondition = (condition: string) => {
@@ -254,7 +221,6 @@ const ForecastRow = ({
   high,
   low,
   icon,
-  tint,
   selected,
   onPress,
   isLast,
@@ -265,7 +231,6 @@ const ForecastRow = ({
   high: string;
   low: string;
   icon: any;
-  tint: string;
   selected: boolean;
   onPress: () => void;
   isLast: boolean;
@@ -304,10 +269,7 @@ const ForecastRow = ({
           {low} / {high}
         </Text>
       </View>
-      <View style={{ width: 26, height: 26, marginHorizontal: 12, alignItems: "center", justifyContent: "center" }}>
-        <Glow size={46} tint={tint} peak={0.4} />
-        <Image source={icon} style={{ width: 26, height: 26 }} />
-      </View>
+      <Image source={icon} style={{ width: 26, height: 26, marginHorizontal: 12 }} />
       <Text
         style={{
           fontSize: 18,
@@ -328,7 +290,6 @@ const HourlyRow = ({
   time,
   temperature,
   icon,
-  tint,
   rainChance,
   isLast,
   colors,
@@ -336,7 +297,6 @@ const HourlyRow = ({
   time: string;
   temperature: string;
   icon: any;
-  tint: string;
   rainChance?: number;
   isLast: boolean;
   colors: any;
@@ -361,10 +321,7 @@ const HourlyRow = ({
     >
       {time}
     </Text>
-    <View style={{ width: 24, height: 24, marginHorizontal: 14, alignItems: "center", justifyContent: "center" }}>
-      <Glow size={44} tint={tint} peak={0.4} />
-      <Image source={icon} style={{ width: 24, height: 24 }} />
-    </View>
+    <Image source={icon} style={{ width: 24, height: 24, marginHorizontal: 14 }} />
     <View style={{ flex: 1 }}>
       {typeof rainChance === "number" && rainChance > 0 ? (
         <View
@@ -526,13 +483,11 @@ export default function Index() {
       high: formatTemperature(day.day.maxtemp_c),
       low: formatTemperature(day.day.mintemp_c),
       icon: getWeatherIcon(day.day.condition.text),
-      tint: getConditionTint(day.day.condition.text),
       hours:
         day.hour?.map((hour: any) => ({
           time: hour.time?.split(" ")[1] || "",
           temperature: formatTemperature(hour.temp_c),
           icon: getWeatherIcon(hour.condition?.text || "Cloudy"),
-          tint: getConditionTint(hour.condition?.text || "Cloudy"),
           rainChance: hour.chance_of_rain,
         })) || [],
     })) || [];
@@ -592,23 +547,8 @@ export default function Index() {
               </Text>
             </View>
 
-            {/* Weather Icon — the glow is centred on the icon itself */}
-            <View style={{ marginVertical: 12, alignItems: "center", justifyContent: "center" }}>
-              <View
-                style={{
-                  position: "absolute",
-                  width: 340,
-                  height: 340,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Glow
-                  size={340}
-                  tint={getConditionTint(weatherData?.current?.condition?.text || "Cloudy")}
-                  peak={0.42}
-                />
-              </View>
+            {/* Weather Icon */}
+            <View style={{ marginVertical: 12 }}>
               <Image
                 source={getWeatherIcon(weatherData?.current?.condition?.text || "Cloudy")}
                 style={{ width: 160, height: 160 }}
@@ -661,7 +601,6 @@ export default function Index() {
                   high={day.high}
                   low={day.low}
                   icon={day.icon}
-                  tint={day.tint}
                   selected={selectedForecastDayIndex === index}
                   onPress={() => setSelectedForecastDayIndex(index)}
                   isLast={index === forecast.length - 1}
@@ -691,7 +630,6 @@ export default function Index() {
                   time={hour.time}
                   temperature={hour.temperature}
                   icon={hour.icon}
-                  tint={hour.tint}
                   rainChance={hour.rainChance}
                   isLast={index === selectedForecastDay.hours.length - 1}
                   colors={colors}
