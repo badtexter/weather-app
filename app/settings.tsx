@@ -12,8 +12,8 @@ import {
 
 const RADIUS = 8;
 
-// A row of options where the active one takes the accent colour and a 2px
-// underline — the same selection mark used for the picked day on the weather tab.
+// A row of options where the active one sits on the accent's pale tint with
+// its dark ink — the same fill used for the selected day on the weather tab.
 function Segmented<T extends string>({
   options,
   value,
@@ -26,7 +26,7 @@ function Segmented<T extends string>({
   colors: any;
 }) {
   return (
-    <View style={{ flexDirection: "row" }}>
+    <View style={{ flexDirection: "row", backgroundColor: colors.ground, borderRadius: 999, padding: 3 }}>
       {options.map((option) => {
         const active = option.value === value;
         return (
@@ -35,18 +35,17 @@ function Segmented<T extends string>({
             onPress={() => onChange(option.value)}
             activeOpacity={0.6}
             style={{
-              paddingVertical: 6,
+              paddingVertical: 5,
               paddingHorizontal: 12,
-              marginLeft: 4,
-              borderBottomWidth: 2,
-              borderBottomColor: active ? colors.accent : "transparent",
+              borderRadius: 999,
+              backgroundColor: active ? colors.raised : "transparent",
             }}
           >
             <Text
               style={{
-                fontSize: 14,
-                fontFamily: active ? "PublicSans_600SemiBold" : "PublicSans_400Regular",
-                color: active ? colors.accent : colors.textSecondary,
+                fontSize: 13,
+                fontFamily: active ? "DMSans_600SemiBold" : "DMSans_400Regular",
+                color: active ? colors.accentInk : colors.textSecondary,
               }}
             >
               {option.label}
@@ -217,7 +216,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     fontSize: 13,
-    fontFamily: "PublicSans_500Medium",
+    fontFamily: "DMSans_500Medium",
     marginLeft: 20,
     marginBottom: 8,
   },
@@ -236,7 +235,7 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     fontSize: 15,
-    fontFamily: "PublicSans_400Regular",
+    fontFamily: "DMSans_400Regular",
   },
   separator: {
     height: 1,
@@ -244,7 +243,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    fontFamily: "PublicSans_400Regular",
+    fontFamily: "DMSans_400Regular",
     marginLeft: 20,
     marginTop: 8,
   },

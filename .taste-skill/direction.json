@@ -1,8 +1,8 @@
 {
  "version": 1,
  "kind": "app",
- "at": "2026-11-04T16:43:03.665Z",
- "seed": 516421238,
+ "at": "2026-11-04T16:44:12.973Z",
+ "seed": 847388391,
  "input": {
   "kind": "creator",
   "brief": "SkyCheck, osobista aplikacja pogodowa na telefon: temperatura, prognoza godzinowa i dzienna",
@@ -120,29 +120,24 @@
   "notes": "All three studied screens of this kind used violet, purple or pink as the one hue. The move does not depend on the hue, so the house's violet and indigo ban holds and the library deals a raspberry instead."
  },
  "shell": {
-  "id": "open-plane",
-  "name": "Open plane",
-  "basis": "5 of 23 screens",
+  "id": "ruled-t-frame",
+  "name": "Ruled T-frame",
+  "basis": "4 of 23 screens (3 dark, 1 light)",
   "suits": [
-   "finance",
-   "wallet",
-   "workspace",
+   "community",
    "creator",
-   "analytics"
+   "smb-admin"
   ],
   "numbers": {
-   "sidebarWidth": "230-256 (230, 240, 256 in the study; 280 and 292 with a built-in icon rail)",
-   "separation": "none, or one 1px hairline; the sidebar sits on the page ground or within 1-2% of it",
-   "navPitch": 34,
-   "navRowHeight": 32,
-   "navIcon": "16px outline, about 1.5px stroke",
-   "navLabel": "14px, 400, grey or ink",
-   "activeItem": "neutral grey pill, radius 6-12, inset 8-12px from the sidebar edges (#e9e9e9-#ededed)",
-   "topBar": "none",
-   "canvas": "fluid with a 24-64px gutter, or a centred 1100px column"
+   "sidebarWidth": "210-240",
+   "topBar": "64px with a 1px bottom rule",
+   "rules": "1px; #1a1a1a on #000, #f2f2f2 on white",
+   "navPitch": "34 (dark) or 40 (light)",
+   "switcher": "at the top bar's right end, behind a full-height 1px divider",
+   "contentGutter": "29px from the sidebar rule and the window edge"
   },
-  "blueprint": "The labelled sidebar sits on the page ground with nothing or one hairline between it and the canvas; there is no top bar, and the page header and cards sit straight on the ground about 32-36px from the top. Workspace or account switcher at the top of the sidebar, primary nav on a 34px pitch, groups under 12-13px sentence-case grey labels with 22-56px of air above, utilities and the user row pushed to the bottom. Cards are white on the off-white ground (or the sidebar is white with a 1px border on a #f9fafb canvas). The canvas is fluid with one gutter value, or a centred column for personal homes.",
-  "phone": "The sidebar folds into a 48px top bar holding the screen's name, a menu button that opens a full-screen sheet with the nav and the switcher, and at most one action. Content takes the full width with 16px margins."
+  "blueprint": "A 210-240px sidebar and a 64px top bar share one ground, divided only by 1px rules. The workspace or community switcher sits at the right end of the top bar behind a full-height divider; the sidebar holds the wordmark and the nav on a 34px pitch with sentence-case group labels. On dark, the active item is its label going from #bbb to #fff. The top bar must carry something real (search, the back link and object name, the switcher): two studied screens left about 1070px of it blank and were flagged.",
+  "phone": "The top bar stays at 48-56px with the switcher reduced to its mark; the sidebar becomes a full-screen menu sheet or a bottom bar of four or five destinations."
  },
  "screens": [
   {

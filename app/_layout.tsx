@@ -1,10 +1,9 @@
-import { JetBrainsMono_500Medium, JetBrainsMono_700Bold } from "@expo-google-fonts/jetbrains-mono";
 import {
-  PublicSans_400Regular,
-  PublicSans_500Medium,
-  PublicSans_600SemiBold,
-  PublicSans_700Bold,
-} from "@expo-google-fonts/public-sans";
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+  DMSans_700Bold,
+} from "@expo-google-fonts/dm-sans";
 import { useFonts } from "expo-font";
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
@@ -18,12 +17,10 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    PublicSans_400Regular,
-    PublicSans_500Medium,
-    PublicSans_600SemiBold,
-    PublicSans_700Bold,
-    JetBrainsMono_500Medium,
-    JetBrainsMono_700Bold,
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
   });
 
   useEffect(() => {
@@ -64,7 +61,7 @@ function RootTabs() {
           tabBarInactiveTintColor: colors.textSecondary,
           tabBarLabelStyle: {
             fontSize: 11,
-            fontFamily: "PublicSans_500Medium",
+            fontFamily: "DMSans_500Medium",
           },
           headerStyle: {
             backgroundColor: colors.tabBackground,
@@ -72,7 +69,7 @@ function RootTabs() {
           headerShadowVisible: false,
           headerTitleStyle: {
             fontSize: 26,
-            fontFamily: "PublicSans_600SemiBold",
+            fontFamily: "DMSans_600SemiBold",
             color: colors.textPrimary,
           },
           headerTitleAlign: "center",

@@ -44,6 +44,62 @@ const getWeatherIcon = (condition: string) => {
   return require("../assets/images/icons/cloudy-day.png");
 };
 
+// The icon set is itself soft gradient art — a tint to match for a glow behind it.
+const getConditionTint = (condition: string) => {
+  const conditionLower = condition.toLowerCase();
+
+  if (conditionLower.includes("sunny") || conditionLower.includes("clear")) return "255,176,64";
+  if (conditionLower.includes("thunder") || conditionLower.includes("storm")) return "150,120,235";
+  if (conditionLower.includes("snow")) return "140,195,255";
+  if (conditionLower.includes("rain") || conditionLower.includes("drizzle")) return "70,140,230";
+  if (conditionLower.includes("fog") || conditionLower.includes("mist")) return "170,176,195";
+
+  return "110,150,220";
+};
+
+// A soft halo behind a weather icon: three flat, translucent circles of the
+// condition's own tint, shrinking and darkening toward the centre — no actual
+// gradient asset, so it stays crisp at any size.
+const IconGlow = ({ size, tint }: { size: number; tint: string }) => (
+  <View
+    style={{
+      position: "absolute",
+      width: size,
+      height: size,
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <View
+      style={{
+        position: "absolute",
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        backgroundColor: `rgba(${tint},0.10)`,
+      }}
+    />
+    <View
+      style={{
+        position: "absolute",
+        width: size * 0.7,
+        height: size * 0.7,
+        borderRadius: (size * 0.7) / 2,
+        backgroundColor: `rgba(${tint},0.16)`,
+      }}
+    />
+    <View
+      style={{
+        position: "absolute",
+        width: size * 0.42,
+        height: size * 0.42,
+        borderRadius: (size * 0.42) / 2,
+        backgroundColor: `rgba(${tint},0.22)`,
+      }}
+    />
+  </View>
+);
+
 const translateCondition = (condition: string) => {
   const conditionLower = condition.toLowerCase();
 
@@ -111,7 +167,7 @@ const SearchBar = ({
           marginLeft: 10,
           flex: 1,
           fontSize: 15,
-          fontFamily: "PublicSans_400Regular",
+          fontFamily: "DMSans_400Regular",
           color: colors.textPrimary,
         }}
       />
@@ -144,7 +200,7 @@ const SearchBar = ({
               borderBottomColor: colors.border,
             }}
           >
-            <Text style={{ fontSize: 14, fontFamily: "PublicSans_400Regular", color: colors.textPrimary }}>
+            <Text style={{ fontSize: 14, fontFamily: "DMSans_400Regular", color: colors.textPrimary }}>
               {location.label}
             </Text>
           </TouchableOpacity>
@@ -190,7 +246,7 @@ const ConditionStrip = ({
           <Text
             style={{
               fontSize: 11,
-              fontFamily: "PublicSans_500Medium",
+              fontFamily: "DMSans_500Medium",
               color: colors.textTertiary,
               marginLeft: 4,
             }}
@@ -201,7 +257,7 @@ const ConditionStrip = ({
         <Text
           style={{
             fontSize: 17,
-            fontFamily: "JetBrainsMono_500Medium",
+            fontFamily: "DMSans_500Medium",
             color: colors.textPrimary,
             marginTop: 6,
           }}
@@ -213,14 +269,15 @@ const ConditionStrip = ({
   </View>
 );
 
-// Forecast row — a daily figure; the selected day is marked by a 2px accent
-// rule on its leading edge and its label taking the accent colour, nothing else moves.
+// Forecast row — the pale tint of the accent fills the selected row (the
+// style's one move for area work); the full hue stays reserved for the figure.
 const ForecastRow = ({
   day,
   temperature,
   high,
   low,
   icon,
+  tint,
   selected,
   onPress,
   isLast,
@@ -231,6 +288,7 @@ const ForecastRow = ({
   high: string;
   low: string;
   icon: any;
+  tint: string;
   selected: boolean;
   onPress: () => void;
   isLast: boolean;
@@ -245,16 +303,15 @@ const ForecastRow = ({
         paddingHorizontal: 14,
         borderBottomWidth: isLast ? 0 : 1,
         borderBottomColor: colors.border,
-        borderLeftWidth: 2,
-        borderLeftColor: selected ? colors.accent : "transparent",
+        backgroundColor: selected ? colors.raised : "transparent",
       }}
     >
-      <View style={{ flex: 1, marginLeft: 10 }}>
+      <View style={{ flex: 1 }}>
         <Text
           style={{
             fontSize: 15,
-            fontFamily: selected ? "PublicSans_600SemiBold" : "PublicSans_400Regular",
-            color: selected ? colors.accent : colors.textPrimary,
+            fontFamily: selected ? "DMSans_600SemiBold" : "DMSans_400Regular",
+            color: selected ? colors.accentInk : colors.textPrimary,
           }}
         >
           {day}
@@ -262,7 +319,7 @@ const ForecastRow = ({
         <Text
           style={{
             fontSize: 12,
-            fontFamily: "JetBrainsMono_500Medium",
+            fontFamily: "DMSans_500Medium",
             color: colors.textTertiary,
             marginTop: 2,
           }}
@@ -270,12 +327,15 @@ const ForecastRow = ({
           {low} / {high}
         </Text>
       </View>
-      <Image source={icon} style={{ width: 26, height: 26, marginHorizontal: 12 }} />
+      <View style={{ width: 26, height: 26, marginHorizontal: 12, alignItems: "center", justifyContent: "center" }}>
+        <IconGlow size={40} tint={tint} />
+        <Image source={icon} style={{ width: 26, height: 26 }} />
+      </View>
       <Text
         style={{
           fontSize: 18,
-          fontFamily: "JetBrainsMono_700Bold",
-          color: colors.textPrimary,
+          fontFamily: "DMSans_700Bold",
+          color: selected ? colors.accent : colors.textPrimary,
           minWidth: 50,
           textAlign: "right",
         }}
@@ -291,6 +351,7 @@ const HourlyRow = ({
   time,
   temperature,
   icon,
+  tint,
   rainChance,
   isLast,
   colors,
@@ -298,6 +359,7 @@ const HourlyRow = ({
   time: string;
   temperature: string;
   icon: any;
+  tint: string;
   rainChance?: number;
   isLast: boolean;
   colors: any;
@@ -316,33 +378,46 @@ const HourlyRow = ({
       style={{
         width: 52,
         fontSize: 13,
-        fontFamily: "JetBrainsMono_500Medium",
+        fontFamily: "DMSans_500Medium",
         color: colors.textSecondary,
       }}
     >
       {time}
     </Text>
-    <Image source={icon} style={{ width: 24, height: 24, marginHorizontal: 14 }} />
-    <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+    <View style={{ width: 24, height: 24, marginHorizontal: 14, alignItems: "center", justifyContent: "center" }}>
+      <IconGlow size={38} tint={tint} />
+      <Image source={icon} style={{ width: 24, height: 24 }} />
+    </View>
+    <View style={{ flex: 1 }}>
       {typeof rainChance === "number" && rainChance > 0 ? (
-        <>
-          <Ionicons name="water" size={12} color={colors.accent} style={{ marginRight: 4 }} />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            alignSelf: "flex-start",
+            backgroundColor: colors.raised,
+            borderRadius: 999,
+            paddingVertical: 3,
+            paddingHorizontal: 8,
+          }}
+        >
+          <Ionicons name="water" size={11} color={colors.accentInk} style={{ marginRight: 3 }} />
           <Text
             style={{
-              fontSize: 13,
-              fontFamily: "JetBrainsMono_500Medium",
-              color: colors.accent,
+              fontSize: 12,
+              fontFamily: "DMSans_500Medium",
+              color: colors.accentInk,
             }}
           >
             {rainChance}%
           </Text>
-        </>
+        </View>
       ) : null}
     </View>
     <Text
       style={{
         fontSize: 15,
-        fontFamily: "JetBrainsMono_700Bold",
+        fontFamily: "DMSans_700Bold",
         color: colors.textPrimary,
         minWidth: 46,
         textAlign: "right",
@@ -474,11 +549,13 @@ export default function Index() {
       high: formatTemperature(day.day.maxtemp_c),
       low: formatTemperature(day.day.mintemp_c),
       icon: getWeatherIcon(day.day.condition.text),
+      tint: getConditionTint(day.day.condition.text),
       hours:
         day.hour?.map((hour: any) => ({
           time: hour.time?.split(" ")[1] || "",
           temperature: formatTemperature(hour.temp_c),
           icon: getWeatherIcon(hour.condition?.text || "Cloudy"),
+          tint: getConditionTint(hour.condition?.text || "Cloudy"),
           rainChance: hour.chance_of_rain,
         })) || [],
     })) || [];
@@ -517,7 +594,7 @@ export default function Index() {
             <Text
               style={{
                 fontSize: 32,
-                fontFamily: "PublicSans_600SemiBold",
+                fontFamily: "DMSans_600SemiBold",
                 color: colors.textPrimary,
               }}
               numberOfLines={1}
@@ -527,7 +604,7 @@ export default function Index() {
             <Text
               style={{
                 fontSize: 13,
-                fontFamily: "PublicSans_400Regular",
+                fontFamily: "DMSans_400Regular",
                 color: colors.textTertiary,
                 marginTop: 3,
               }}
@@ -537,7 +614,8 @@ export default function Index() {
           </View>
 
           {/* Weather Icon */}
-          <View style={{ alignItems: "center", marginVertical: 12 }}>
+          <View style={{ alignItems: "center", justifyContent: "center", marginVertical: 12, height: 110 }}>
+            <IconGlow size={190} tint={getConditionTint(weatherData?.current?.condition?.text || "Cloudy")} />
             <Image
               source={getWeatherIcon(weatherData?.current?.condition?.text || "Cloudy")}
               style={{ width: 110, height: 110 }}
@@ -550,7 +628,7 @@ export default function Index() {
             <Text
               style={{
                 fontSize: 64,
-                fontFamily: "JetBrainsMono_700Bold",
+                fontFamily: "DMSans_700Bold",
                 color: colors.accent,
               }}
             >
@@ -559,7 +637,7 @@ export default function Index() {
             <Text
               style={{
                 fontSize: 15,
-                fontFamily: "PublicSans_500Medium",
+                fontFamily: "DMSans_500Medium",
                 color: colors.textSecondary,
                 marginTop: 4,
               }}
@@ -577,7 +655,7 @@ export default function Index() {
 
           {/* Daily Forecast */}
           <View style={{ marginTop: 28, paddingHorizontal: 20 }}>
-            <Text style={{ fontSize: 13, fontFamily: "PublicSans_500Medium", color: colors.textTertiary, marginBottom: 8 }}>
+            <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary, marginBottom: 8 }}>
               Prognoza dzienna
             </Text>
             <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
@@ -589,6 +667,7 @@ export default function Index() {
                   high={day.high}
                   low={day.low}
                   icon={day.icon}
+                  tint={day.tint}
                   selected={selectedForecastDayIndex === index}
                   onPress={() => setSelectedForecastDayIndex(index)}
                   isLast={index === forecast.length - 1}
@@ -601,11 +680,11 @@ export default function Index() {
           {/* Hourly Forecast */}
           <View style={{ marginTop: 24, marginBottom: 20, paddingHorizontal: 20 }}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-              <Text style={{ fontSize: 13, fontFamily: "PublicSans_500Medium", color: colors.textTertiary }}>
+              <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary }}>
                 Prognoza godzinowa
               </Text>
               {selectedForecastDay && (
-                <Text style={{ fontSize: 12, fontFamily: "PublicSans_400Regular", color: colors.textTertiary }}>
+                <Text style={{ fontSize: 12, fontFamily: "DMSans_400Regular", color: colors.textTertiary }}>
                   {selectedForecastDay.day}
                 </Text>
               )}
@@ -618,6 +697,7 @@ export default function Index() {
                   time={hour.time}
                   temperature={hour.temperature}
                   icon={hour.icon}
+                  tint={hour.tint}
                   rainChance={hour.rainChance}
                   isLast={index === selectedForecastDay.hours.length - 1}
                   colors={colors}

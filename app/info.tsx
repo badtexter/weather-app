@@ -76,13 +76,13 @@ export default function Info() {
             furnished to do so, subject to the following conditions.
           </Text>
           <View style={[styles.licenseTags, { borderTopColor: colors.border }]}>
-            <Text style={[styles.tag, { color: colors.accent, borderColor: colors.border }]}>
+            <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
               Open Source
             </Text>
-            <Text style={[styles.tag, { color: colors.accent, borderColor: colors.border }]}>
+            <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
               Free Use
             </Text>
-            <Text style={[styles.tag, { color: colors.accent, borderColor: colors.border }]}>
+            <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
               MIT
             </Text>
           </View>
@@ -123,12 +123,12 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: 24,
-    fontFamily: "PublicSans_600SemiBold",
+    fontFamily: "DMSans_600SemiBold",
     marginBottom: 4,
   },
   appSubtitle: {
     fontSize: 14,
-    fontFamily: "PublicSans_400Regular",
+    fontFamily: "DMSans_400Regular",
     marginBottom: 20,
   },
   versionContainer: {
@@ -136,16 +136,16 @@ const styles = StyleSheet.create({
   },
   versionLabel: {
     fontSize: 12,
-    fontFamily: "PublicSans_500Medium",
+    fontFamily: "DMSans_500Medium",
     marginBottom: 4,
   },
   versionValue: {
     fontSize: 16,
-    fontFamily: "JetBrainsMono_700Bold",
+    fontFamily: "DMSans_700Bold",
   },
   sectionHeader: {
     fontSize: 13,
-    fontFamily: "PublicSans_500Medium",
+    fontFamily: "DMSans_500Medium",
     marginLeft: 4,
     marginBottom: 8,
   },
@@ -164,11 +164,11 @@ const styles = StyleSheet.create({
   },
   cellLabel: {
     fontSize: 15,
-    fontFamily: "PublicSans_400Regular",
+    fontFamily: "DMSans_400Regular",
   },
   cellValue: {
     fontSize: 15,
-    fontFamily: "PublicSans_400Regular",
+    fontFamily: "DMSans_400Regular",
   },
   licensePanel: {
     borderRadius: RADIUS,
@@ -189,17 +189,17 @@ const styles = StyleSheet.create({
   },
   licenseTitle: {
     fontSize: 15,
-    fontFamily: "PublicSans_600SemiBold",
+    fontFamily: "DMSans_600SemiBold",
   },
   licenseYear: {
     fontSize: 13,
-    fontFamily: "PublicSans_400Regular",
+    fontFamily: "DMSans_400Regular",
     marginBottom: 14,
     marginLeft: 14,
   },
   licenseText: {
     fontSize: 12,
-    fontFamily: "PublicSans_400Regular",
+    fontFamily: "DMSans_400Regular",
     lineHeight: 18,
     marginBottom: 16,
   },
@@ -212,16 +212,15 @@ const styles = StyleSheet.create({
   },
   tag: {
     fontSize: 11,
-    fontFamily: "PublicSans_500Medium",
+    fontFamily: "DMSans_500Medium",
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 4,
-    borderWidth: 1,
+    borderRadius: 999,
     overflow: "hidden",
   },
   link: {
     fontSize: 13,
-    fontFamily: "PublicSans_400Regular",
+    fontFamily: "DMSans_400Regular",
     textAlign: "center",
     paddingVertical: 8,
   },

@@ -5,32 +5,35 @@ export type AppThemeName = "light" | "dark";
 
 export const THEME_KEY = "app.theme";
 
-// data-terminal: dense, monospace numbers, cards barely lighter than the ground,
-// one blue used only as a 1px selection line and on the main data figure.
+// accent-ladder: the full blue only on small marks (the main figure, a badge,
+// the active row's icon); its pale tint does the area work (selected rows,
+// badges). Everything else stays plain ink on a near-white ground.
 const themeColors = {
   light: {
-    ground: "#F2F3F5",
+    ground: "#F7FAFE",
     surface: "#FFFFFF",
-    raised: "#E8E9EC",
-    border: "#DEDFE2",
-    textPrimary: "#14151A",
-    textSecondary: "#5B5D63",
-    textTertiary: "#8C8E93",
-    accent: "#1D63B8",
+    raised: "#EAF2FE",
+    border: "#E5E7EB",
+    textPrimary: "#111827",
+    textSecondary: "#5F6672",
+    textTertiary: "#9CA3AF",
+    accent: "#2F6FED",
+    accentInk: "#0B4A8F",
     tabBackground: "#FFFFFF",
-    tabBorder: "#DEDFE2",
+    tabBorder: "#E5E7EB",
   },
   dark: {
-    ground: "#0B1020",
-    surface: "#121832",
-    raised: "#1B2340",
-    border: "#283158",
-    textPrimary: "#ECEEF5",
-    textSecondary: "#9AA0BE",
-    textTertiary: "#70769A",
-    accent: "#FFFFFF",
-    tabBackground: "#121832",
-    tabBorder: "#283158",
+    ground: "#101521",
+    surface: "#171D2C",
+    raised: "#1C2740",
+    border: "#28324A",
+    textPrimary: "#F3F5FA",
+    textSecondary: "#A7AFC2",
+    textTertiary: "#6E7690",
+    accent: "#5B9BFF",
+    accentInk: "#BFD9FF",
+    tabBackground: "#171D2C",
+    tabBorder: "#28324A",
   },
 };
 
