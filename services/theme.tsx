@@ -5,35 +5,40 @@ export type AppThemeName = "light" | "dark";
 
 export const THEME_KEY = "app.theme";
 
-// accent-ladder: the full blue only on small marks (the main figure, a badge,
-// the active row's icon); its pale tint does the area work (selected rows,
-// badges). Everything else stays plain ink on a near-white ground.
+// "Sicily" palette: deep blue #1D59BB, sky blue #76B9FF, pale gold #FEF3B3,
+// amber #FEBD19. Blue is the one functional accent (the full strength only on
+// small marks — the main figure, the active row's ink); amber is the single
+// secondary highlight, reserved for the rain-chance badge.
 const themeColors = {
   light: {
-    ground: "#F7FAFE",
+    ground: "#FBFAF5",
     surface: "#FFFFFF",
-    raised: "#EAF2FE",
-    border: "#E5E7EB",
-    textPrimary: "#111827",
-    textSecondary: "#5F6672",
-    textTertiary: "#9CA3AF",
-    accent: "#2F6FED",
-    accentInk: "#0B4A8F",
+    raised: "#E9F1FD",
+    border: "#E6E4DC",
+    textPrimary: "#15181D",
+    textSecondary: "#5B6270",
+    textTertiary: "#8D93A0",
+    accent: "#1D59BB",
+    accentInk: "#0D3C80",
+    warm: "#FEBD19",
+    warmInk: "#8A5A06",
     tabBackground: "#FFFFFF",
-    tabBorder: "#E5E7EB",
+    tabBorder: "#E6E4DC",
   },
   dark: {
-    ground: "#101521",
-    surface: "#171D2C",
-    raised: "#1C2740",
-    border: "#28324A",
-    textPrimary: "#F3F5FA",
-    textSecondary: "#A7AFC2",
-    textTertiary: "#6E7690",
-    accent: "#5B9BFF",
-    accentInk: "#BFD9FF",
-    tabBackground: "#171D2C",
-    tabBorder: "#28324A",
+    ground: "#0E131C",
+    surface: "#171E29",
+    raised: "#212A38",
+    border: "#2B3645",
+    textPrimary: "#F6F8FB",
+    textSecondary: "#A9B2C3",
+    textTertiary: "#707A8C",
+    accent: "#76B9FF",
+    accentInk: "#CDE6FF",
+    warm: "#FEBD19",
+    warmInk: "#FEF3B3",
+    tabBackground: "#171E29",
+    tabBorder: "#2B3645",
   },
 };
 

@@ -149,7 +149,7 @@ export default function Settings() {
                 value={notifications}
                 onValueChange={handleNotificationsChange}
                 disabled={notificationPending}
-                trackColor={{ false: colors.border, true: colors.accent }}
+                trackColor={{ false: colors.border, true: colors.warm }}
                 ios_backgroundColor={colors.border}
                 thumbColor="#FFFFFF"
               />
