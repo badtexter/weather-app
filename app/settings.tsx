@@ -80,7 +80,7 @@ export default function Settings() {
       >
         {/* Wygląd */}
         <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: textSecondary }]}>WYGLĄD</Text>
+          <Text style={[styles.sectionHeader, { color: textSecondary }]}>Wygląd</Text>
           <View style={[styles.card, { backgroundColor: colors.card, borderColor, borderWidth: theme === "light" ? 0 : 0.5 }]}>
             <TouchableOpacity style={styles.cell} onPress={toggleTheme} activeOpacity={0.6}>
               <Text style={[styles.cellLabel, { color: textColor }]}>Motyw</Text>
@@ -96,7 +96,7 @@ export default function Settings() {
 
         {/* Powiadomienia */}
         <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: textSecondary }]}>POWIADOMIENIA</Text>
+          <Text style={[styles.sectionHeader, { color: textSecondary }]}>Powiadomienia</Text>
           <View style={[styles.card, { backgroundColor: colors.card, borderColor, borderWidth: theme === "light" ? 0 : 0.5 }]}>
             <View style={styles.cell}>
               <Text style={[styles.cellLabel, { color: textColor }]}>Prognoza pogodowa</Text>
@@ -121,7 +121,7 @@ export default function Settings() {
 
         {/* Jednostki */}
         <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: textSecondary }]}>JEDNOSTKI</Text>
+          <Text style={[styles.sectionHeader, { color: textSecondary }]}>Jednostki</Text>
           <View style={[styles.card, { backgroundColor: colors.card, borderColor, borderWidth: theme === "light" ? 0 : 0.5 }]}>
             <TouchableOpacity style={styles.cell} onPress={toggleTemperatureUnit} activeOpacity={0.6}>
               <Text style={[styles.cellLabel, { color: textColor }]}>Temperatura</Text>
@@ -170,9 +170,8 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   sectionHeader: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "500",
-    letterSpacing: 0.8,
     marginLeft: 20,
     marginBottom: 8,
   },

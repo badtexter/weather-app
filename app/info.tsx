@@ -5,9 +5,17 @@ import { useAppTheme } from "../services/theme";
 export default function Info() {
   const { colors } = useAppTheme();
 
-  const cardStyle = [styles.card, { backgroundColor: colors.card, shadowColor: colors.shadow }];
-  const labelStyle = [styles.infoLabel, { color: colors.textSecondary }];
-  const valueStyle = [styles.infoValue, { color: colors.textPrimary }];
+  const rows = [
+    { label: "Autor", value: "Klaudia Pabin" },
+    {
+      label: "GitHub",
+      value: "@badtexter",
+      accent: true,
+      onPress: () => Linking.openURL("https://github.com/badtexter"),
+    },
+    { label: "System", value: "Android 14" },
+    { label: "Licencja", value: "MIT" },
+  ];
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -16,9 +24,9 @@ export default function Info() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        <View style={[styles.mainCard, { backgroundColor: colors.card, shadowColor: colors.shadow }]}>
+        <View style={[styles.mainCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.appName, { color: colors.textPrimary }]}>SkyCheck</Text>
-          <Text style={[styles.appSubtitle, { color: colors.textSecondary }]}>Aplikacja Pogodowa</Text>
+          <Text style={[styles.appSubtitle, { color: colors.textSecondary }]}>Aplikacja pogodowa</Text>
 
           <View style={styles.versionContainer}>
             <Text style={[styles.versionLabel, { color: colors.textSecondary }]}>Wersja</Text>
@@ -26,34 +34,31 @@ export default function Info() {
           </View>
         </View>
 
-        <View style={styles.infoGrid}>
-          <View style={cardStyle}>
-            <Text style={labelStyle}>Autor</Text>
-            <Text style={valueStyle}>Klaudia Pabin</Text>
-          </View>
-
-          <View style={cardStyle}>
-            <Text style={labelStyle}>GitHub</Text>
-            <Text
-              style={[styles.infoValue, { color: colors.secondaryAccent }]}
-              onPress={() => Linking.openURL("https://github.com/badtexter")}
-            >
-              @badtexter
-            </Text>
-          </View>
-
-          <View style={cardStyle}>
-            <Text style={labelStyle}>System</Text>
-            <Text style={valueStyle}>Android 14</Text>
-          </View>
-
-          <View style={cardStyle}>
-            <Text style={labelStyle}>Licencja</Text>
-            <Text style={valueStyle}>MIT</Text>
-          </View>
+        <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Szczegóły</Text>
+        <View style={[styles.listCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          {rows.map((row, index) => (
+            <React.Fragment key={row.label}>
+              <View style={styles.cell}>
+                <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>{row.label}</Text>
+                <Text
+                  style={[
+                    styles.cellValue,
+                    { color: row.accent ? colors.secondaryAccent : colors.textSecondary },
+                  ]}
+                  onPress={row.onPress}
+                >
+                  {row.value}
+                </Text>
+              </View>
+              {index < rows.length - 1 && (
+                <View style={[styles.separator, { backgroundColor: colors.border }]} />
+              )}
+            </React.Fragment>
+          ))}
         </View>
 
-        <View style={[styles.licenseCard, { backgroundColor: colors.card, shadowColor: colors.shadow }]}>
+        <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Licencja</Text>
+        <View style={[styles.licenseCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.licenseHeader}>
             <View style={[styles.licenseDot, { backgroundColor: colors.secondaryAccent }]} />
             <Text style={[styles.licenseTitle, { color: colors.textPrimary }]}>MIT License</Text>
@@ -108,14 +113,11 @@ const styles = StyleSheet.create({
     paddingTop: 35,
   },
   mainCard: {
-    borderRadius: 28,
+    borderRadius: 24,
+    borderWidth: 1,
     padding: 28,
-    marginBottom: 20,
+    marginBottom: 24,
     alignItems: "center",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
   },
   appName: {
     fontSize: 28,
@@ -138,41 +140,42 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
-  infoGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  card: {
-    borderRadius: 20,
-    padding: 18,
-    width: "48%",
-    marginBottom: 12,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  infoLabel: {
-    fontSize: 11,
+  sectionHeader: {
+    fontSize: 13,
     fontWeight: "500",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
+    marginLeft: 4,
     marginBottom: 8,
   },
-  infoValue: {
-    fontSize: 15,
-    fontWeight: "500",
+  listCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 24,
+    overflow: "hidden",
+  },
+  cell: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 15,
+  },
+  cellLabel: {
+    fontSize: 16,
+    fontWeight: "400",
+  },
+  cellValue: {
+    fontSize: 16,
+    fontWeight: "400",
+  },
+  separator: {
+    height: 0.5,
+    marginLeft: 18,
   },
   licenseCard: {
-    borderRadius: 20,
+    borderRadius: 16,
+    borderWidth: 1,
     padding: 20,
     marginBottom: 20,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
   },
   licenseHeader: {
     flexDirection: "row",

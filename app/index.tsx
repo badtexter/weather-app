@@ -195,11 +195,10 @@ const InfoCard = ({
       <Ionicons name={icon as any} size={22} color={isDark ? "white" : "#333"} />
       <Text
         style={{
-          fontSize: 11,
+          fontSize: 13,
           fontWeight: "500",
           color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.5)",
           marginTop: 8,
-          letterSpacing: 0.5,
         }}
       >
         {label}
@@ -228,6 +227,7 @@ const ForecastCard = ({
   selected,
   onPress,
   isDark,
+  accentColor,
 }: {
   day: string;
   temperature: string;
@@ -237,6 +237,7 @@ const ForecastCard = ({
   selected: boolean;
   onPress: () => void;
   isDark: boolean;
+  accentColor: string;
 }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
     <BlurView
@@ -250,7 +251,7 @@ const ForecastCard = ({
     >
       <View
         style={{
-          backgroundColor: selected 
+          backgroundColor: selected
             ? isDark ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.8)"
             : isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.3)",
           paddingVertical: 12,
@@ -258,14 +259,16 @@ const ForecastCard = ({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
+          borderLeftWidth: selected ? 3 : 0,
+          borderLeftColor: accentColor,
         }}
       >
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginLeft: selected ? 9 : 0 }}>
           <Text
             style={{
               fontSize: 16,
               fontWeight: selected ? "600" : "400",
-              color: isDark ? "white" : "#111",
+              color: selected ? accentColor : isDark ? "white" : "#111",
             }}
           >
             {day}
@@ -363,7 +366,7 @@ const HourlyCard = ({
 );
 
 export default function Index() {
-  const { isDark } = useAppTheme();
+  const { isDark, colors } = useAppTheme();
   const { formatTemperature, formatWindSpeed } = useUnits();
 
   const [showSearch, setShowSearch] = useState(false);
@@ -460,17 +463,17 @@ export default function Index() {
   const weatherInfo = [
     {
       icon: "speedometer-outline",
-      label: "WIATR",
+      label: "Wiatr",
       value: weatherData ? formatWindSpeed(weatherData.current.wind_kph) : "-",
     },
     {
       icon: "water-outline",
-      label: "WILGOTNOŚĆ",
+      label: "Wilgotność",
       value: weatherData ? `${weatherData.current.humidity}%` : "-",
     },
     {
       icon: "eye-outline",
-      label: "WIDOCZNOŚĆ",
+      label: "Widoczność",
       value: weatherData ? `${weatherData.current.vis_km} km` : "-",
     },
   ];
@@ -617,6 +620,7 @@ export default function Index() {
                 selected={selectedForecastDayIndex === index}
                 onPress={() => setSelectedForecastDayIndex(index)}
                 isDark={isDark}
+                accentColor={colors.accent}
               />
             ))}
           </View>
