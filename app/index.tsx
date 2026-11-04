@@ -10,6 +10,14 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   getCurrent,
@@ -151,7 +159,8 @@ const SearchBar = ({
     </View>
 
     {showResults && locations.length > 0 && (
-      <View
+      <Animated.View
+        entering={FadeIn.duration(150)}
         style={{
           position: "absolute",
           top: 50,
@@ -182,7 +191,7 @@ const SearchBar = ({
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </Animated.View>
     )}
   </View>
 );
@@ -248,6 +257,7 @@ const ConditionStrip = ({
 
 // Forecast row — the pale tint of the accent fills the selected row (the
 // style's one move for area work); the full hue stays reserved for the figure.
+// The fill animates in rather than snapping, so the selection reads as a move.
 const ForecastRow = ({
   day,
   temperature,
@@ -268,55 +278,69 @@ const ForecastRow = ({
   onPress: () => void;
   isLast: boolean;
   colors: any;
-}) => (
-  <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        paddingVertical: 13,
-        paddingHorizontal: 14,
-        borderBottomWidth: isLast ? 0 : 1,
-        borderBottomColor: colors.border,
-        backgroundColor: selected ? colors.raised : "transparent",
-      }}
-    >
-      <View style={{ flex: 1 }}>
-        <Text
-          style={{
-            fontSize: 15,
-            fontFamily: selected ? "DMSans_600SemiBold" : "DMSans_400Regular",
-            color: selected ? colors.accentInk : colors.textPrimary,
-          }}
-        >
-          {day}
-        </Text>
-        <Text
-          style={{
-            fontSize: 12,
-            fontFamily: "DMSans_500Medium",
-            color: colors.textTertiary,
-            marginTop: 2,
-          }}
-        >
-          {low} / {high}
-        </Text>
-      </View>
-      <Image source={icon} style={{ width: 26, height: 26, marginHorizontal: 12 }} />
-      <Text
-        style={{
-          fontSize: 18,
-          fontFamily: "DMSans_700Bold",
-          color: selected ? colors.accent : colors.textPrimary,
-          minWidth: 50,
-          textAlign: "right",
-        }}
+}) => {
+  const progress = useSharedValue(selected ? 1 : 0);
+
+  useEffect(() => {
+    progress.value = withTiming(selected ? 1 : 0, { duration: 220 });
+  }, [selected, progress]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(progress.value, [0, 1], [colors.surface, colors.raised]),
+  }));
+
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <Animated.View
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            paddingVertical: 13,
+            paddingHorizontal: 14,
+            borderBottomWidth: isLast ? 0 : 1,
+            borderBottomColor: colors.border,
+          },
+          animatedStyle,
+        ]}
       >
-        {temperature}
-      </Text>
-    </View>
-  </TouchableOpacity>
-);
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              fontSize: 15,
+              fontFamily: selected ? "DMSans_600SemiBold" : "DMSans_400Regular",
+              color: selected ? colors.accentInk : colors.textPrimary,
+            }}
+          >
+            {day}
+          </Text>
+          <Text
+            style={{
+              fontSize: 12,
+              fontFamily: "DMSans_500Medium",
+              color: colors.textTertiary,
+              marginTop: 2,
+            }}
+          >
+            {low} / {high}
+          </Text>
+        </View>
+        <Image source={icon} style={{ width: 26, height: 26, marginHorizontal: 12 }} />
+        <Text
+          style={{
+            fontSize: 18,
+            fontFamily: "DMSans_700Bold",
+            color: selected ? colors.accent : colors.textPrimary,
+            minWidth: 50,
+            textAlign: "right",
+          }}
+        >
+          {temperature}
+        </Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+};
 
 // Hourly Row
 const HourlyRow = ({
@@ -397,7 +421,10 @@ const HourlyRow = ({
 
 // Shown on first load, before any weather has ever arrived for this location.
 const LoadingState = ({ colors }: { colors: any }) => (
-  <View style={{ alignItems: "center", paddingHorizontal: 32, marginTop: 60 }}>
+  <Animated.View
+    entering={FadeIn.duration(200)}
+    style={{ alignItems: "center", paddingHorizontal: 32, marginTop: 60 }}
+  >
     <ActivityIndicator size="large" color={colors.accent} />
     <Text
       style={{
@@ -409,7 +436,7 @@ const LoadingState = ({ colors }: { colors: any }) => (
     >
       Ładowanie pogody…
     </Text>
-  </View>
+  </Animated.View>
 );
 
 // Shown when the fetch failed outright — distinct from "no data yet" and
@@ -423,7 +450,10 @@ const ErrorState = ({
   onRetry: () => void;
   colors: any;
 }) => (
-  <View style={{ alignItems: "center", paddingHorizontal: 32, marginTop: 40 }}>
+  <Animated.View
+    entering={FadeIn.duration(200)}
+    style={{ alignItems: "center", paddingHorizontal: 32, marginTop: 40 }}
+  >
     <Ionicons name="cloud-offline-outline" size={36} color={colors.textTertiary} />
     <Text
       style={{
@@ -463,7 +493,7 @@ const ErrorState = ({
         Spróbuj ponownie
       </Text>
     </TouchableOpacity>
-  </View>
+  </Animated.View>
 );
 
 export default function Index() {
@@ -635,8 +665,12 @@ export default function Index() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 40 }}
         >
-          {/* Hero: location, icon and temperature */}
-          <View style={{ alignItems: "center", marginTop: 20 }}>
+          {/* Hero: location, icon and temperature — re-enters whenever the city changes */}
+          <Animated.View
+            key={selectedLocation}
+            entering={FadeInDown.duration(350)}
+            style={{ alignItems: "center", marginTop: 20 }}
+          >
             {/* Location */}
             <View style={{ alignItems: "center", marginBottom: 8 }}>
               <Text
@@ -696,7 +730,7 @@ export default function Index() {
                 </View>
               </>
             )}
-          </View>
+          </Animated.View>
 
           {error ? (
             <ErrorState message={error} onRetry={() => fetchWeather(selectedLocation)} colors={colors} />
@@ -705,12 +739,18 @@ export default function Index() {
           ) : weatherData ? (
             <>
               {/* Current conditions */}
-              <View style={{ paddingHorizontal: 20, marginTop: 28 }}>
+              <Animated.View
+                entering={FadeInDown.duration(350).delay(80)}
+                style={{ paddingHorizontal: 20, marginTop: 28 }}
+              >
                 <ConditionStrip items={weatherInfo} colors={colors} />
-              </View>
+              </Animated.View>
 
               {/* Daily Forecast */}
-              <View style={{ marginTop: 28, paddingHorizontal: 20 }}>
+              <Animated.View
+                entering={FadeInDown.duration(350).delay(140)}
+                style={{ marginTop: 28, paddingHorizontal: 20 }}
+              >
                 <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary, marginBottom: 8 }}>
                   Prognoza dzienna
                 </Text>
@@ -730,10 +770,13 @@ export default function Index() {
                     />
                   ))}
                 </View>
-              </View>
+              </Animated.View>
 
               {/* Hourly Forecast */}
-              <View style={{ marginTop: 24, marginBottom: 20, paddingHorizontal: 20 }}>
+              <Animated.View
+                entering={FadeInDown.duration(350).delay(200)}
+                style={{ marginTop: 24, marginBottom: 20, paddingHorizontal: 20 }}
+              >
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
                   <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary }}>
                     Prognoza godzinowa
@@ -745,7 +788,11 @@ export default function Index() {
                   )}
                 </View>
 
-                <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
+                <Animated.View
+                  key={selectedForecastDayIndex}
+                  entering={FadeIn.duration(200)}
+                  style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}
+                >
                   {selectedForecastDay?.hours?.map((hour, index) => (
                     <HourlyRow
                       key={index}
@@ -757,8 +804,8 @@ export default function Index() {
                       colors={colors}
                     />
                   ))}
-                </View>
-              </View>
+                </Animated.View>
+              </Animated.View>
             </>
           ) : null}
         </ScrollView>

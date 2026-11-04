@@ -1,5 +1,6 @@
 import React from "react";
 import { Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useAppTheme } from "../services/theme";
 
 export default function Info() {
@@ -24,7 +25,10 @@ export default function Info() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        <View style={[styles.mainPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Animated.View
+          entering={FadeInDown.duration(300)}
+          style={[styles.mainPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
           <Text style={[styles.appName, { color: colors.textPrimary }]}>SkyCheck</Text>
           <Text style={[styles.appSubtitle, { color: colors.textSecondary }]}>Aplikacja pogodowa</Text>
 
@@ -32,68 +36,72 @@ export default function Info() {
             <Text style={[styles.versionLabel, { color: colors.textTertiary }]}>Wersja</Text>
             <Text style={[styles.versionValue, { color: colors.accent }]}>1.0.1</Text>
           </View>
-        </View>
+        </Animated.View>
 
-        <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Szczegóły</Text>
-        <View style={[styles.listPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          {rows.map((row, index) => (
-            <View
-              key={row.label}
-              style={[
-                styles.cell,
-                index < rows.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
-              ]}
-            >
-              <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>{row.label}</Text>
-              <Text
+        <Animated.View entering={FadeInDown.duration(300).delay(60)}>
+          <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Szczegóły</Text>
+          <View style={[styles.listPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            {rows.map((row, index) => (
+              <View
+                key={row.label}
                 style={[
-                  styles.cellValue,
-                  { color: row.accent ? colors.accent : colors.textSecondary },
+                  styles.cell,
+                  index < rows.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
                 ]}
-                onPress={row.onPress}
               >
-                {row.value}
+                <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>{row.label}</Text>
+                <Text
+                  style={[
+                    styles.cellValue,
+                    { color: row.accent ? colors.accent : colors.textSecondary },
+                  ]}
+                  onPress={row.onPress}
+                >
+                  {row.value}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.duration(300).delay(120)}>
+          <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Licencja</Text>
+          <View style={[styles.licensePanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.licenseHeader}>
+              <View style={[styles.licenseDot, { backgroundColor: colors.accent }]} />
+              <Text style={[styles.licenseTitle, { color: colors.textPrimary }]}>MIT License</Text>
+            </View>
+            <Text style={[styles.licenseYear, { color: colors.textTertiary }]}>
+              Copyright © 2026 Klaudia Pabin
+            </Text>
+            <Text style={[styles.licenseText, { color: colors.textSecondary }]}>
+              Permission is hereby granted, free of charge, to any person obtaining a copy
+              of this software and associated documentation files (the "Software"), to deal
+              in the Software without restriction, including without limitation the rights
+              to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+              copies of the Software, and to permit persons to whom the Software is
+              furnished to do so, subject to the following conditions.
+            </Text>
+            <View style={[styles.licenseTags, { borderTopColor: colors.border }]}>
+              <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
+                Open Source
+              </Text>
+              <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
+                Free Use
+              </Text>
+              <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
+                MIT
               </Text>
             </View>
-          ))}
-        </View>
-
-        <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Licencja</Text>
-        <View style={[styles.licensePanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <View style={styles.licenseHeader}>
-            <View style={[styles.licenseDot, { backgroundColor: colors.accent }]} />
-            <Text style={[styles.licenseTitle, { color: colors.textPrimary }]}>MIT License</Text>
           </View>
-          <Text style={[styles.licenseYear, { color: colors.textTertiary }]}>
-            Copyright © 2026 Klaudia Pabin
-          </Text>
-          <Text style={[styles.licenseText, { color: colors.textSecondary }]}>
-            Permission is hereby granted, free of charge, to any person obtaining a copy
-            of this software and associated documentation files (the "Software"), to deal
-            in the Software without restriction, including without limitation the rights
-            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-            copies of the Software, and to permit persons to whom the Software is
-            furnished to do so, subject to the following conditions.
-          </Text>
-          <View style={[styles.licenseTags, { borderTopColor: colors.border }]}>
-            <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
-              Open Source
-            </Text>
-            <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
-              Free Use
-            </Text>
-            <Text style={[styles.tag, { color: colors.accentInk, backgroundColor: colors.raised }]}>
-              MIT
-            </Text>
-          </View>
-        </View>
 
-        <Text
-          style={[styles.link, { color: colors.accent }]}
-          onPress={() => Linking.openURL("https://opensource.org/licenses/MIT")}
-        >
-          opensource.org/licenses/MIT →
-        </Text>
+          <Text
+            style={[styles.link, { color: colors.accent }]}
+            onPress={() => Linking.openURL("https://opensource.org/licenses/MIT")}
+          >
+            opensource.org/licenses/MIT →
+          </Text>
+        </Animated.View>
 
         <View style={styles.bottomSpacing} />
       </ScrollView>

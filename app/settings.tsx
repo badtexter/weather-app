@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { getCurrent } from "../api/weather";
 import { useAppTheme } from "../services/theme";
 import { TemperatureUnit, WindSpeedUnit, useUnits } from "../services/units";
@@ -11,6 +19,55 @@ import {
 } from "../services/weatherNotifications";
 
 const RADIUS = 8;
+
+// One option of a Segmented control — its fill animates in rather than
+// snapping, the same move as the selected day on the weather tab.
+function SegmentedOption<T extends string>({
+  option,
+  active,
+  onPress,
+  colors,
+}: {
+  option: { label: string; value: T };
+  active: boolean;
+  onPress: () => void;
+  colors: any;
+}) {
+  const progress = useSharedValue(active ? 1 : 0);
+
+  useEffect(() => {
+    progress.value = withTiming(active ? 1 : 0, { duration: 180 });
+  }, [active, progress]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(progress.value, [0, 1], ["transparent", colors.raised]),
+  }));
+
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.6}>
+      <Animated.View
+        style={[
+          {
+            paddingVertical: 5,
+            paddingHorizontal: 12,
+            borderRadius: 999,
+          },
+          animatedStyle,
+        ]}
+      >
+        <Text
+          style={{
+            fontSize: 13,
+            fontFamily: active ? "DMSans_600SemiBold" : "DMSans_400Regular",
+            color: active ? colors.accentInk : colors.textSecondary,
+          }}
+        >
+          {option.label}
+        </Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
 
 // A row of options where the active one sits on the accent's pale tint with
 // its dark ink — the same fill used for the selected day on the weather tab.
@@ -27,32 +84,15 @@ function Segmented<T extends string>({
 }) {
   return (
     <View style={{ flexDirection: "row", backgroundColor: colors.ground, borderRadius: 999, padding: 3 }}>
-      {options.map((option) => {
-        const active = option.value === value;
-        return (
-          <TouchableOpacity
-            key={option.value}
-            onPress={() => onChange(option.value)}
-            activeOpacity={0.6}
-            style={{
-              paddingVertical: 5,
-              paddingHorizontal: 12,
-              borderRadius: 999,
-              backgroundColor: active ? colors.raised : "transparent",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 13,
-                fontFamily: active ? "DMSans_600SemiBold" : "DMSans_400Regular",
-                color: active ? colors.accentInk : colors.textSecondary,
-              }}
-            >
-              {option.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
+      {options.map((option) => (
+        <SegmentedOption
+          key={option.value}
+          option={option}
+          active={option.value === value}
+          onPress={() => onChange(option.value)}
+          colors={colors}
+        />
+      ))}
     </View>
   );
 }
@@ -121,7 +161,7 @@ export default function Settings() {
         contentContainerStyle={styles.contentContainer}
       >
         {/* Wygląd */}
-        <View style={styles.section}>
+        <Animated.View entering={FadeInDown.duration(300)} style={styles.section}>
           <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Wygląd</Text>
           <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.row}>
@@ -137,10 +177,10 @@ export default function Settings() {
               />
             </View>
           </View>
-        </View>
+        </Animated.View>
 
         {/* Powiadomienia */}
-        <View style={styles.section}>
+        <Animated.View entering={FadeInDown.duration(300).delay(60)} style={styles.section}>
           <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Powiadomienia</Text>
           <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.row}>
@@ -155,13 +195,17 @@ export default function Settings() {
               />
             </View>
           </View>
-          <Text style={[styles.footerText, { color: colors.textTertiary }]}>
+          <Animated.Text
+            key={notificationStatus}
+            entering={FadeIn.duration(180)}
+            style={[styles.footerText, { color: colors.textTertiary }]}
+          >
             {notificationStatus || "Powiadomienia będą wysyłane co 3 godziny"}
-          </Text>
-        </View>
+          </Animated.Text>
+        </Animated.View>
 
         {/* Jednostki */}
-        <View style={styles.section}>
+        <Animated.View entering={FadeInDown.duration(300).delay(120)} style={styles.section}>
           <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Jednostki</Text>
           <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.row}>
@@ -193,7 +237,7 @@ export default function Settings() {
               />
             </View>
           </View>
-        </View>
+        </Animated.View>
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
