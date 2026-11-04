@@ -51,3 +51,6 @@ api/secret.js
 
 # design-taste-frontend skill output
 .taste-skill/
+
+# test coverage
+coverage/

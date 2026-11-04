@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   Text,
@@ -24,7 +25,39 @@ import {
 
 const RADIUS = 8;
 
-const getWeatherIcon = (condition: string) => {
+export type WeatherCondition = { text: string };
+
+export type CurrentWeatherResponse = {
+  current: {
+    temp_c: number;
+    humidity: number;
+    vis_km: number;
+    wind_kph: number;
+    condition: WeatherCondition;
+  };
+};
+
+export type ForecastResponse = {
+  forecast: {
+    forecastday: Array<{
+      date: string;
+      day: {
+        avgtemp_c: number;
+        maxtemp_c: number;
+        mintemp_c: number;
+        condition: WeatherCondition;
+      };
+      hour: Array<{
+        time: string;
+        temp_c: number;
+        condition?: WeatherCondition;
+        chance_of_rain: number;
+      }>;
+    }>;
+  };
+};
+
+export const getWeatherIcon = (condition: string) => {
   const conditionLower = condition.toLowerCase();
 
   if (conditionLower.includes("sunny") || conditionLower.includes("clear")) {
@@ -44,7 +77,7 @@ const getWeatherIcon = (condition: string) => {
   return require("../assets/images/icons/cloudy-day.png");
 };
 
-const translateCondition = (condition: string) => {
+export const translateCondition = (condition: string) => {
   const conditionLower = condition.toLowerCase();
 
   if (conditionLower.includes("sunny")) return "Słonecznie";
@@ -60,7 +93,7 @@ const translateCondition = (condition: string) => {
   return condition || "Brak danych";
 };
 
-const formatForecastDay = (date: string, index: number) => {
+export const formatForecastDay = (date: string, index: number) => {
   if (index === 0) return "Dzisiaj";
   if (index === 1) return "Jutro";
   return new Date(date).toLocaleDateString("pl-PL", { weekday: "long" });
@@ -362,6 +395,77 @@ const HourlyRow = ({
   </View>
 );
 
+// Shown on first load, before any weather has ever arrived for this location.
+const LoadingState = ({ colors }: { colors: any }) => (
+  <View style={{ alignItems: "center", paddingHorizontal: 32, marginTop: 60 }}>
+    <ActivityIndicator size="large" color={colors.accent} />
+    <Text
+      style={{
+        fontSize: 14,
+        fontFamily: "DMSans_400Regular",
+        color: colors.textSecondary,
+        marginTop: 14,
+      }}
+    >
+      Ładowanie pogody…
+    </Text>
+  </View>
+);
+
+// Shown when the fetch failed outright — distinct from "no data yet" and
+// from a successful response with nothing interesting in it.
+const ErrorState = ({
+  message,
+  onRetry,
+  colors,
+}: {
+  message: string;
+  onRetry: () => void;
+  colors: any;
+}) => (
+  <View style={{ alignItems: "center", paddingHorizontal: 32, marginTop: 40 }}>
+    <Ionicons name="cloud-offline-outline" size={36} color={colors.textTertiary} />
+    <Text
+      style={{
+        fontSize: 16,
+        fontFamily: "DMSans_600SemiBold",
+        color: colors.textPrimary,
+        marginTop: 14,
+        textAlign: "center",
+      }}
+    >
+      Nie udało się pobrać pogody
+    </Text>
+    <Text
+      style={{
+        fontSize: 14,
+        fontFamily: "DMSans_400Regular",
+        color: colors.textSecondary,
+        marginTop: 6,
+        textAlign: "center",
+        lineHeight: 20,
+      }}
+    >
+      {message}
+    </Text>
+    <TouchableOpacity
+      onPress={onRetry}
+      activeOpacity={0.8}
+      style={{
+        marginTop: 20,
+        backgroundColor: colors.accent,
+        borderRadius: RADIUS,
+        paddingVertical: 10,
+        paddingHorizontal: 22,
+      }}
+    >
+      <Text style={{ fontSize: 14, fontFamily: "DMSans_600SemiBold", color: "#FFFFFF" }}>
+        Spróbuj ponownie
+      </Text>
+    </TouchableOpacity>
+  </View>
+);
+
 export default function Index() {
   const { isDark, colors } = useAppTheme();
   const { formatTemperature, formatWindSpeed } = useUnits();
@@ -370,40 +474,50 @@ export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Kalisz");
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
-  const [weatherData, setWeatherData] = useState<any | null>(null);
-  const [forecastData, setForecastData] = useState<any | null>(null);
+  const [weatherData, setWeatherData] = useState<CurrentWeatherResponse | null>(null);
+  const [forecastData, setForecastData] = useState<ForecastResponse | null>(null);
   const [selectedForecastDayIndex, setSelectedForecastDayIndex] = useState(0);
   const [locationOptions, setLocationOptions] = useState<
     Array<{ label: string; query: string }>
   >([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchWeather = async (location: string) => {
     setLoading(true);
-    try {
-      const [currentResult, forecastResult] = await Promise.allSettled([
-        getCurrent({ cityName: location, includeAqi: "yes" }),
-        getForecast({
-          cityName: location,
-          days: 3,
-          includeAqi: "yes",
-          includeAlerts: "no",
-        }),
-      ]);
+    setError(null);
 
-      if (currentResult.status === "fulfilled") {
-        setWeatherData(currentResult.value);
-      }
-      if (forecastResult.status === "fulfilled") {
-        setForecastData(forecastResult.value);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+    const [currentResult, forecastResult] = await Promise.allSettled([
+      getCurrent({ cityName: location, includeAqi: "yes" }),
+      getForecast({
+        cityName: location,
+        days: 3,
+        includeAqi: "yes",
+        includeAlerts: "no",
+      }),
+    ]);
+
+    if (currentResult.status === "fulfilled") {
+      setWeatherData(currentResult.value);
+    } else {
+      console.error(currentResult.reason);
+      setWeatherData(null);
     }
+
+    if (forecastResult.status === "fulfilled") {
+      setForecastData(forecastResult.value);
+    } else {
+      console.error(forecastResult.reason);
+      setForecastData(null);
+    }
+
+    if (currentResult.status === "rejected") {
+      setError(`Nie udało się pobrać pogody dla „${location}”. Sprawdź nazwę miasta i połączenie z internetem.`);
+    }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -476,7 +590,7 @@ export default function Index() {
   ];
 
   const forecast =
-    forecastData?.forecast?.forecastday?.map((day: any, index: number) => ({
+    forecastData?.forecast?.forecastday?.map((day, index) => ({
       date: day.date,
       day: formatForecastDay(day.date, index),
       temperature: formatTemperature(day.day.avgtemp_c),
@@ -484,7 +598,7 @@ export default function Index() {
       low: formatTemperature(day.day.mintemp_c),
       icon: getWeatherIcon(day.day.condition.text),
       hours:
-        day.hour?.map((hour: any) => ({
+        day.hour?.map((hour) => ({
           time: hour.time?.split(" ")[1] || "",
           temperature: formatTemperature(hour.temp_c),
           icon: getWeatherIcon(hour.condition?.text || "Cloudy"),
@@ -547,96 +661,106 @@ export default function Index() {
               </Text>
             </View>
 
-            {/* Weather Icon */}
-            <View style={{ marginVertical: 12 }}>
-              <Image
-                source={getWeatherIcon(weatherData?.current?.condition?.text || "Cloudy")}
-                style={{ width: 160, height: 160 }}
-                resizeMode="contain"
-              />
-            </View>
+            {!error && weatherData && (
+              <>
+                {/* Weather Icon */}
+                <View style={{ marginVertical: 12 }}>
+                  <Image
+                    source={getWeatherIcon(weatherData.current.condition.text)}
+                    style={{ width: 160, height: 160 }}
+                    resizeMode="contain"
+                  />
+                </View>
 
-            {/* Temperature */}
-            <View style={{ alignItems: "center" }}>
-              <Text
-                style={{
-                  fontSize: 88,
-                  fontFamily: "DMSans_700Bold",
-                  color: colors.accent,
-                }}
-              >
-                {formatTemperature(weatherData?.current?.temp_c)}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 17,
-                  fontFamily: "DMSans_500Medium",
-                  color: colors.textSecondary,
-                  marginTop: 4,
-                }}
-              >
-                {weatherData
-                  ? translateCondition(weatherData.current.condition.text)
-                  : loading ? "Ładowanie..." : "Brak danych"}
-              </Text>
-            </View>
+                {/* Temperature */}
+                <View style={{ alignItems: "center" }}>
+                  <Text
+                    style={{
+                      fontSize: 88,
+                      fontFamily: "DMSans_700Bold",
+                      color: colors.accent,
+                    }}
+                  >
+                    {formatTemperature(weatherData.current.temp_c)}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      fontFamily: "DMSans_500Medium",
+                      color: colors.textSecondary,
+                      marginTop: 4,
+                    }}
+                  >
+                    {translateCondition(weatherData.current.condition.text)}
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
 
-          {/* Current conditions */}
-          <View style={{ paddingHorizontal: 20, marginTop: 28 }}>
-            <ConditionStrip items={weatherInfo} colors={colors} />
-          </View>
+          {error ? (
+            <ErrorState message={error} onRetry={() => fetchWeather(selectedLocation)} colors={colors} />
+          ) : loading && !weatherData ? (
+            <LoadingState colors={colors} />
+          ) : weatherData ? (
+            <>
+              {/* Current conditions */}
+              <View style={{ paddingHorizontal: 20, marginTop: 28 }}>
+                <ConditionStrip items={weatherInfo} colors={colors} />
+              </View>
 
-          {/* Daily Forecast */}
-          <View style={{ marginTop: 28, paddingHorizontal: 20 }}>
-            <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary, marginBottom: 8 }}>
-              Prognoza dzienna
-            </Text>
-            <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
-              {forecast.map((day, index) => (
-                <ForecastRow
-                  key={index}
-                  day={day.day}
-                  temperature={day.temperature}
-                  high={day.high}
-                  low={day.low}
-                  icon={day.icon}
-                  selected={selectedForecastDayIndex === index}
-                  onPress={() => setSelectedForecastDayIndex(index)}
-                  isLast={index === forecast.length - 1}
-                  colors={colors}
-                />
-              ))}
-            </View>
-          </View>
-
-          {/* Hourly Forecast */}
-          <View style={{ marginTop: 24, marginBottom: 20, paddingHorizontal: 20 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-              <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary }}>
-                Prognoza godzinowa
-              </Text>
-              {selectedForecastDay && (
-                <Text style={{ fontSize: 12, fontFamily: "DMSans_400Regular", color: colors.textTertiary }}>
-                  {selectedForecastDay.day}
+              {/* Daily Forecast */}
+              <View style={{ marginTop: 28, paddingHorizontal: 20 }}>
+                <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary, marginBottom: 8 }}>
+                  Prognoza dzienna
                 </Text>
-              )}
-            </View>
+                <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
+                  {forecast.map((day, index) => (
+                    <ForecastRow
+                      key={index}
+                      day={day.day}
+                      temperature={day.temperature}
+                      high={day.high}
+                      low={day.low}
+                      icon={day.icon}
+                      selected={selectedForecastDayIndex === index}
+                      onPress={() => setSelectedForecastDayIndex(index)}
+                      isLast={index === forecast.length - 1}
+                      colors={colors}
+                    />
+                  ))}
+                </View>
+              </View>
 
-            <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
-              {selectedForecastDay?.hours?.map((hour, index) => (
-                <HourlyRow
-                  key={index}
-                  time={hour.time}
-                  temperature={hour.temperature}
-                  icon={hour.icon}
-                  rainChance={hour.rainChance}
-                  isLast={index === selectedForecastDay.hours.length - 1}
-                  colors={colors}
-                />
-              ))}
-            </View>
-          </View>
+              {/* Hourly Forecast */}
+              <View style={{ marginTop: 24, marginBottom: 20, paddingHorizontal: 20 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+                  <Text style={{ fontSize: 13, fontFamily: "DMSans_500Medium", color: colors.textTertiary }}>
+                    Prognoza godzinowa
+                  </Text>
+                  {selectedForecastDay && (
+                    <Text style={{ fontSize: 12, fontFamily: "DMSans_400Regular", color: colors.textTertiary }}>
+                      {selectedForecastDay.day}
+                    </Text>
+                  )}
+                </View>
+
+                <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
+                  {selectedForecastDay?.hours?.map((hour, index) => (
+                    <HourlyRow
+                      key={index}
+                      time={hour.time}
+                      temperature={hour.temperature}
+                      icon={hour.icon}
+                      rainChance={hour.rainChance}
+                      isLast={index === selectedForecastDay.hours.length - 1}
+                      colors={colors}
+                    />
+                  ))}
+                </View>
+              </View>
+            </>
+          ) : null}
         </ScrollView>
       </SafeAreaView>
     </View>
