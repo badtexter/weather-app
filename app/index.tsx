@@ -10,6 +10,7 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, { Defs, RadialGradient, Stop, Rect } from "react-native-svg";
 import {
   getCurrent,
   getForecast,
@@ -57,48 +58,24 @@ const getConditionTint = (condition: string) => {
   return "110,150,220";
 };
 
-// A soft halo behind a weather icon: three flat, translucent circles of the
-// condition's own tint, shrinking and darkening toward the centre — no actual
-// gradient asset, so it stays crisp at any size.
-const IconGlow = ({ size, tint }: { size: number; tint: string }) => (
-  <View
-    style={{
-      position: "absolute",
-      width: size,
-      height: size,
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <View
-      style={{
-        position: "absolute",
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: `rgba(${tint},0.10)`,
-      }}
-    />
-    <View
-      style={{
-        position: "absolute",
-        width: size * 0.7,
-        height: size * 0.7,
-        borderRadius: (size * 0.7) / 2,
-        backgroundColor: `rgba(${tint},0.16)`,
-      }}
-    />
-    <View
-      style={{
-        position: "absolute",
-        width: size * 0.42,
-        height: size * 0.42,
-        borderRadius: (size * 0.42) / 2,
-        backgroundColor: `rgba(${tint},0.22)`,
-      }}
-    />
-  </View>
-);
+// A soft radial glow behind a weather icon, the condition's own tint fading
+// smoothly to nothing — a real SVG radial gradient, not a stack of flat rings,
+// so it has no visible banding at any size.
+const Glow = ({ size, tint, peak = 0.3 }: { size: number; tint: string; peak?: number }) => {
+  const id = React.useId().replace(/:/g, "");
+  return (
+    <Svg width={size} height={size} style={{ position: "absolute" }}>
+      <Defs>
+        <RadialGradient id={id} cx="50%" cy="50%" r="50%">
+          <Stop offset="0%" stopColor={`rgb(${tint})`} stopOpacity={peak} />
+          <Stop offset="55%" stopColor={`rgb(${tint})`} stopOpacity={peak * 0.4} />
+          <Stop offset="100%" stopColor={`rgb(${tint})`} stopOpacity={0} />
+        </RadialGradient>
+      </Defs>
+      <Rect width={size} height={size} fill={`url(#${id})`} />
+    </Svg>
+  );
+};
 
 const translateCondition = (condition: string) => {
   const conditionLower = condition.toLowerCase();
@@ -328,7 +305,7 @@ const ForecastRow = ({
         </Text>
       </View>
       <View style={{ width: 26, height: 26, marginHorizontal: 12, alignItems: "center", justifyContent: "center" }}>
-        <IconGlow size={40} tint={tint} />
+        <Glow size={46} tint={tint} peak={0.4} />
         <Image source={icon} style={{ width: 26, height: 26 }} />
       </View>
       <Text
@@ -385,7 +362,7 @@ const HourlyRow = ({
       {time}
     </Text>
     <View style={{ width: 24, height: 24, marginHorizontal: 14, alignItems: "center", justifyContent: "center" }}>
-      <IconGlow size={38} tint={tint} />
+      <Glow size={44} tint={tint} peak={0.4} />
       <Image source={icon} style={{ width: 24, height: 24 }} />
     </View>
     <View style={{ flex: 1 }}>
@@ -589,63 +566,80 @@ export default function Index() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 40 }}
         >
-          {/* Location */}
-          <View style={{ alignItems: "center", marginTop: 20, marginBottom: 8 }}>
-            <Text
-              style={{
-                fontSize: 32,
-                fontFamily: "DMSans_600SemiBold",
-                color: colors.textPrimary,
-              }}
-              numberOfLines={1}
-            >
-              {selectedLocation}
-            </Text>
-            <Text
-              style={{
-                fontSize: 13,
-                fontFamily: "DMSans_400Regular",
-                color: colors.textTertiary,
-                marginTop: 3,
-              }}
-            >
-              Polska
-            </Text>
-          </View>
+          {/* Hero: location, icon and temperature */}
+          <View style={{ alignItems: "center", marginTop: 20 }}>
+            {/* Location */}
+            <View style={{ alignItems: "center", marginBottom: 8 }}>
+              <Text
+                style={{
+                  fontSize: 36,
+                  fontFamily: "DMSans_600SemiBold",
+                  color: colors.textPrimary,
+                }}
+                numberOfLines={1}
+              >
+                {selectedLocation}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontFamily: "DMSans_400Regular",
+                  color: colors.textTertiary,
+                  marginTop: 3,
+                }}
+              >
+                Polska
+              </Text>
+            </View>
 
-          {/* Weather Icon */}
-          <View style={{ alignItems: "center", justifyContent: "center", marginVertical: 12, height: 110 }}>
-            <IconGlow size={190} tint={getConditionTint(weatherData?.current?.condition?.text || "Cloudy")} />
-            <Image
-              source={getWeatherIcon(weatherData?.current?.condition?.text || "Cloudy")}
-              style={{ width: 110, height: 110 }}
-              resizeMode="contain"
-            />
-          </View>
+            {/* Weather Icon — the glow is centred on the icon itself */}
+            <View style={{ marginVertical: 12, alignItems: "center", justifyContent: "center" }}>
+              <View
+                style={{
+                  position: "absolute",
+                  width: 340,
+                  height: 340,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Glow
+                  size={340}
+                  tint={getConditionTint(weatherData?.current?.condition?.text || "Cloudy")}
+                  peak={0.42}
+                />
+              </View>
+              <Image
+                source={getWeatherIcon(weatherData?.current?.condition?.text || "Cloudy")}
+                style={{ width: 160, height: 160 }}
+                resizeMode="contain"
+              />
+            </View>
 
-          {/* Temperature */}
-          <View style={{ alignItems: "center" }}>
-            <Text
-              style={{
-                fontSize: 64,
-                fontFamily: "DMSans_700Bold",
-                color: colors.accent,
-              }}
-            >
-              {formatTemperature(weatherData?.current?.temp_c)}
-            </Text>
-            <Text
-              style={{
-                fontSize: 15,
-                fontFamily: "DMSans_500Medium",
-                color: colors.textSecondary,
-                marginTop: 4,
-              }}
-            >
-              {weatherData
-                ? translateCondition(weatherData.current.condition.text)
-                : loading ? "Ładowanie..." : "Brak danych"}
-            </Text>
+            {/* Temperature */}
+            <View style={{ alignItems: "center" }}>
+              <Text
+                style={{
+                  fontSize: 88,
+                  fontFamily: "DMSans_700Bold",
+                  color: colors.accent,
+                }}
+              >
+                {formatTemperature(weatherData?.current?.temp_c)}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 17,
+                  fontFamily: "DMSans_500Medium",
+                  color: colors.textSecondary,
+                  marginTop: 4,
+                }}
+              >
+                {weatherData
+                  ? translateCondition(weatherData.current.condition.text)
+                  : loading ? "Ładowanie..." : "Brak danych"}
+              </Text>
+            </View>
           </View>
 
           {/* Current conditions */}

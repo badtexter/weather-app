@@ -48,3 +48,6 @@ app-example
 /ios
 /android
 api/secret.js
+
+# design-taste-frontend skill output
+.taste-skill/
