@@ -18,52 +18,53 @@ export default function Info() {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.ground }]}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
       >
-        <View style={[styles.mainCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={[styles.mainPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[styles.appName, { color: colors.textPrimary }]}>SkyCheck</Text>
           <Text style={[styles.appSubtitle, { color: colors.textSecondary }]}>Aplikacja pogodowa</Text>
 
           <View style={styles.versionContainer}>
-            <Text style={[styles.versionLabel, { color: colors.textSecondary }]}>Wersja</Text>
-            <Text style={[styles.versionValue, { color: colors.textPrimary }]}>1.0.1</Text>
+            <Text style={[styles.versionLabel, { color: colors.textTertiary }]}>Wersja</Text>
+            <Text style={[styles.versionValue, { color: colors.accent }]}>1.0.1</Text>
           </View>
         </View>
 
-        <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Szczegóły</Text>
-        <View style={[styles.listCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Szczegóły</Text>
+        <View style={[styles.listPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {rows.map((row, index) => (
-            <React.Fragment key={row.label}>
-              <View style={styles.cell}>
-                <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>{row.label}</Text>
-                <Text
-                  style={[
-                    styles.cellValue,
-                    { color: row.accent ? colors.secondaryAccent : colors.textSecondary },
-                  ]}
-                  onPress={row.onPress}
-                >
-                  {row.value}
-                </Text>
-              </View>
-              {index < rows.length - 1 && (
-                <View style={[styles.separator, { backgroundColor: colors.border }]} />
-              )}
-            </React.Fragment>
+            <View
+              key={row.label}
+              style={[
+                styles.cell,
+                index < rows.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
+              ]}
+            >
+              <Text style={[styles.cellLabel, { color: colors.textPrimary }]}>{row.label}</Text>
+              <Text
+                style={[
+                  styles.cellValue,
+                  { color: row.accent ? colors.accent : colors.textSecondary },
+                ]}
+                onPress={row.onPress}
+              >
+                {row.value}
+              </Text>
+            </View>
           ))}
         </View>
 
-        <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Licencja</Text>
-        <View style={[styles.licenseCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Licencja</Text>
+        <View style={[styles.licensePanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.licenseHeader}>
-            <View style={[styles.licenseDot, { backgroundColor: colors.secondaryAccent }]} />
+            <View style={[styles.licenseDot, { backgroundColor: colors.accent }]} />
             <Text style={[styles.licenseTitle, { color: colors.textPrimary }]}>MIT License</Text>
           </View>
-          <Text style={[styles.licenseYear, { color: colors.textSecondary }]}>
+          <Text style={[styles.licenseYear, { color: colors.textTertiary }]}>
             Copyright © 2026 Klaudia Pabin
           </Text>
           <Text style={[styles.licenseText, { color: colors.textSecondary }]}>
@@ -75,20 +76,20 @@ export default function Info() {
             furnished to do so, subject to the following conditions.
           </Text>
           <View style={[styles.licenseTags, { borderTopColor: colors.border }]}>
-            <Text style={[styles.tag, { color: colors.secondaryAccent, backgroundColor: colors.border }]}>
+            <Text style={[styles.tag, { color: colors.accent, borderColor: colors.border }]}>
               Open Source
             </Text>
-            <Text style={[styles.tag, { color: colors.secondaryAccent, backgroundColor: colors.border }]}>
+            <Text style={[styles.tag, { color: colors.accent, borderColor: colors.border }]}>
               Free Use
             </Text>
-            <Text style={[styles.tag, { color: colors.secondaryAccent, backgroundColor: colors.border }]}>
+            <Text style={[styles.tag, { color: colors.accent, borderColor: colors.border }]}>
               MIT
             </Text>
           </View>
         </View>
 
         <Text
-          style={[styles.link, { color: colors.secondaryAccent }]}
+          style={[styles.link, { color: colors.accent }]}
           onPress={() => Linking.openURL("https://opensource.org/licenses/MIT")}
         >
           opensource.org/licenses/MIT →
@@ -100,6 +101,8 @@ export default function Info() {
   );
 }
 
+const RADIUS = 8;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -108,46 +111,46 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    marginTop: 15,
     paddingHorizontal: 20,
-    paddingTop: 35,
+    paddingTop: 24,
   },
-  mainCard: {
-    borderRadius: 24,
+  mainPanel: {
+    borderRadius: RADIUS,
     borderWidth: 1,
-    padding: 28,
+    padding: 24,
     marginBottom: 24,
     alignItems: "center",
   },
   appName: {
-    fontSize: 28,
-    fontWeight: "500",
+    fontSize: 24,
+    fontFamily: "PublicSans_600SemiBold",
     marginBottom: 4,
   },
   appSubtitle: {
     fontSize: 14,
-    fontWeight: "400",
-    marginBottom: 24,
+    fontFamily: "PublicSans_400Regular",
+    marginBottom: 20,
   },
   versionContainer: {
     alignItems: "center",
   },
   versionLabel: {
     fontSize: 12,
+    fontFamily: "PublicSans_500Medium",
     marginBottom: 4,
   },
   versionValue: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 16,
+    fontFamily: "JetBrainsMono_700Bold",
   },
   sectionHeader: {
     fontSize: 13,
-    fontWeight: "500",
+    fontFamily: "PublicSans_500Medium",
     marginLeft: 4,
     marginBottom: 8,
   },
-  listCard: {
-    borderRadius: 16,
+  listPanel: {
+    borderRadius: RADIUS,
     borderWidth: 1,
     marginBottom: 24,
     overflow: "hidden",
@@ -156,25 +159,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 18,
-    paddingVertical: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   cellLabel: {
-    fontSize: 16,
-    fontWeight: "400",
+    fontSize: 15,
+    fontFamily: "PublicSans_400Regular",
   },
   cellValue: {
-    fontSize: 16,
-    fontWeight: "400",
+    fontSize: 15,
+    fontFamily: "PublicSans_400Regular",
   },
-  separator: {
-    height: 0.5,
-    marginLeft: 18,
-  },
-  licenseCard: {
-    borderRadius: 16,
+  licensePanel: {
+    borderRadius: RADIUS,
     borderWidth: 1,
-    padding: 20,
+    padding: 18,
     marginBottom: 20,
   },
   licenseHeader: {
@@ -183,22 +182,24 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   licenseDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     marginRight: 8,
   },
   licenseTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 15,
+    fontFamily: "PublicSans_600SemiBold",
   },
   licenseYear: {
     fontSize: 13,
+    fontFamily: "PublicSans_400Regular",
     marginBottom: 14,
-    marginLeft: 16,
+    marginLeft: 14,
   },
   licenseText: {
     fontSize: 12,
+    fontFamily: "PublicSans_400Regular",
     lineHeight: 18,
     marginBottom: 16,
   },
@@ -206,18 +207,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    paddingTop: 8,
+    paddingTop: 12,
     borderTopWidth: 1,
   },
   tag: {
     fontSize: 11,
-    paddingHorizontal: 12,
+    fontFamily: "PublicSans_500Medium",
+    paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 14,
+    borderRadius: 4,
+    borderWidth: 1,
     overflow: "hidden",
   },
   link: {
     fontSize: 13,
+    fontFamily: "PublicSans_400Regular",
     textAlign: "center",
     paddingVertical: 8,
   },

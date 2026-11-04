@@ -1,10 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { BlurView } from "expo-blur";
-import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Dimensions,
   Image,
   ScrollView,
   Text,
@@ -25,7 +22,7 @@ import {
   saveSelectedLocation,
 } from "../services/weatherNotifications";
 
-const { width } = Dimensions.get("window");
+const RADIUS = 8;
 
 const getWeatherIcon = (condition: string) => {
   const conditionLower = condition.toLowerCase();
@@ -78,7 +75,7 @@ const SearchBar = ({
   showResults,
   locations,
   onSelectLocation,
-  isDark,
+  colors,
 }: {
   value: string;
   onChangeText: (text: string) => void;
@@ -87,138 +84,138 @@ const SearchBar = ({
   showResults: boolean;
   locations: Array<{ label: string; query: string }>;
   onSelectLocation: (location: { label: string; query: string }) => void;
-  isDark: boolean;
+  colors: any;
 }) => (
   <View style={{ position: "relative", zIndex: 50, paddingHorizontal: 20, marginTop: 8 }}>
-    <BlurView
-      intensity={80}
-      tint={isDark ? "dark" : "light"}
+    <View
       style={{
-        borderRadius: 28,
-        overflow: "hidden",
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: colors.surface,
+        borderRadius: RADIUS,
+        borderWidth: 1,
+        borderColor: colors.border,
+        paddingHorizontal: 14,
+        height: 44,
       }}
     >
-      <View
+      <Ionicons name="search" size={17} color={colors.textSecondary} />
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        placeholder="Wyszukaj miasto"
+        placeholderTextColor={colors.textTertiary}
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: isDark ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.7)",
-          paddingHorizontal: 16,
-          height: 52,
+          marginLeft: 10,
+          flex: 1,
+          fontSize: 15,
+          fontFamily: "PublicSans_400Regular",
+          color: colors.textPrimary,
         }}
-      >
-        <Ionicons name="search" size={20} color={isDark ? "white" : "#333"} />
-        <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          placeholder="Wyszukaj miasto"
-          placeholderTextColor={isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)"}
-          style={{
-            marginLeft: 12,
-            flex: 1,
-            fontSize: 16,
-            color: isDark ? "white" : "#111",
-          }}
-        />
-      </View>
-    </BlurView>
+      />
+    </View>
 
     {showResults && locations.length > 0 && (
-      <BlurView
-        intensity={90}
-        tint={isDark ? "dark" : "light"}
+      <View
         style={{
           position: "absolute",
-          top: 60,
+          top: 50,
           left: 20,
           right: 20,
-          borderRadius: 20,
+          borderRadius: RADIUS,
+          borderWidth: 1,
+          borderColor: colors.border,
           overflow: "hidden",
           zIndex: 100,
+          backgroundColor: colors.raised,
         }}
       >
-        <View style={{ backgroundColor: isDark ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.8)" }}>
-          {locations.map((location, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => onSelectLocation(location)}
-              activeOpacity={0.7}
-              style={{
-                paddingVertical: 14,
-                paddingHorizontal: 16,
-                borderBottomWidth: index < locations.length - 1 ? 0.5 : 0,
-                borderBottomColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
-              }}
-            >
-              <Text style={{ fontSize: 15, color: isDark ? "white" : "#111" }}>
-                {location.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </BlurView>
+        {locations.map((location, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => onSelectLocation(location)}
+            activeOpacity={0.7}
+            style={{
+              paddingVertical: 13,
+              paddingHorizontal: 14,
+              borderBottomWidth: index < locations.length - 1 ? 1 : 0,
+              borderBottomColor: colors.border,
+            }}
+          >
+            <Text style={{ fontSize: 14, fontFamily: "PublicSans_400Regular", color: colors.textPrimary }}>
+              {location.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     )}
   </View>
 );
 
-// Info Card
-const InfoCard = ({
-  icon,
-  label,
-  value,
-  isDark,
+// A single strip holding the three current-conditions figures, split by 1px rules —
+// one KPI container rather than three separate tiles.
+const ConditionStrip = ({
+  items,
+  colors,
 }: {
-  icon: string;
-  label: string;
-  value: string;
-  isDark: boolean;
+  items: Array<{ icon: string; label: string; value: string }>;
+  colors: any;
 }) => (
-  <BlurView
-    intensity={70}
-    tint={isDark ? "dark" : "light"}
+  <View
     style={{
-      flex: 1,
-      borderRadius: 24,
+      flexDirection: "row",
+      borderRadius: RADIUS,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
       overflow: "hidden",
-      marginHorizontal: 6,
     }}
   >
-    <View
-      style={{
-        backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.5)",
-        paddingVertical: 16,
-        alignItems: "center",
-      }}
-    >
-      <Ionicons name={icon as any} size={22} color={isDark ? "white" : "#333"} />
-      <Text
+    {items.map((item, index) => (
+      <View
+        key={item.label}
         style={{
-          fontSize: 13,
-          fontWeight: "500",
-          color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.5)",
-          marginTop: 8,
+          flex: 1,
+          paddingVertical: 14,
+          paddingHorizontal: 10,
+          alignItems: "flex-start",
+          borderLeftWidth: index === 0 ? 0 : 1,
+          borderLeftColor: colors.border,
         }}
       >
-        {label}
-      </Text>
-      <Text
-        style={{
-          fontSize: 18,
-          fontWeight: "600",
-          color: isDark ? "white" : "#111",
-          marginTop: 4,
-        }}
-      >
-        {value}
-      </Text>
-    </View>
-  </BlurView>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Ionicons name={item.icon as any} size={13} color={colors.textTertiary} />
+          <Text
+            style={{
+              fontSize: 11,
+              fontFamily: "PublicSans_500Medium",
+              color: colors.textTertiary,
+              marginLeft: 4,
+            }}
+          >
+            {item.label}
+          </Text>
+        </View>
+        <Text
+          style={{
+            fontSize: 17,
+            fontFamily: "JetBrainsMono_500Medium",
+            color: colors.textPrimary,
+            marginTop: 6,
+          }}
+        >
+          {item.value}
+        </Text>
+      </View>
+    ))}
+  </View>
 );
 
-// Forecast Card
-const ForecastCard = ({
+// Forecast row — a daily figure; the selected day is marked by a 2px accent
+// rule on its leading edge and its label taking the accent colour, nothing else moves.
+const ForecastRow = ({
   day,
   temperature,
   high,
@@ -226,8 +223,8 @@ const ForecastCard = ({
   icon,
   selected,
   onPress,
-  isDark,
-  accentColor,
+  isLast,
+  colors,
 }: {
   day: string;
   temperature: string;
@@ -236,133 +233,124 @@ const ForecastCard = ({
   icon: any;
   selected: boolean;
   onPress: () => void;
-  isDark: boolean;
-  accentColor: string;
+  isLast: boolean;
+  colors: any;
 }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-    <BlurView
-      intensity={selected ? 90 : 50}
-      tint={isDark ? "dark" : "light"}
+    <View
       style={{
-        borderRadius: 20,
-        overflow: "hidden",
-        marginBottom: 8,
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 13,
+        paddingHorizontal: 14,
+        borderBottomWidth: isLast ? 0 : 1,
+        borderBottomColor: colors.border,
+        borderLeftWidth: 2,
+        borderLeftColor: selected ? colors.accent : "transparent",
       }}
     >
-      <View
-        style={{
-          backgroundColor: selected
-            ? isDark ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.8)"
-            : isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.3)",
-          paddingVertical: 12,
-          paddingHorizontal: 16,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderLeftWidth: selected ? 3 : 0,
-          borderLeftColor: accentColor,
-        }}
-      >
-        <View style={{ flex: 1, marginLeft: selected ? 9 : 0 }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: selected ? "600" : "400",
-              color: selected ? accentColor : isDark ? "white" : "#111",
-            }}
-          >
-            {day}
-          </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)",
-              marginTop: 2,
-            }}
-          >
-            {low} / {high}
-          </Text>
-        </View>
-        <Image source={icon} style={{ width: 32, height: 32, marginHorizontal: 12 }} />
+      <View style={{ flex: 1, marginLeft: 10 }}>
         <Text
           style={{
-            fontSize: 22,
-            fontWeight: selected ? "600" : "300",
-            color: isDark ? "white" : "#111",
+            fontSize: 15,
+            fontFamily: selected ? "PublicSans_600SemiBold" : "PublicSans_400Regular",
+            color: selected ? colors.accent : colors.textPrimary,
           }}
         >
-          {temperature}
+          {day}
+        </Text>
+        <Text
+          style={{
+            fontSize: 12,
+            fontFamily: "JetBrainsMono_500Medium",
+            color: colors.textTertiary,
+            marginTop: 2,
+          }}
+        >
+          {low} / {high}
         </Text>
       </View>
-    </BlurView>
+      <Image source={icon} style={{ width: 26, height: 26, marginHorizontal: 12 }} />
+      <Text
+        style={{
+          fontSize: 18,
+          fontFamily: "JetBrainsMono_700Bold",
+          color: colors.textPrimary,
+          minWidth: 50,
+          textAlign: "right",
+        }}
+      >
+        {temperature}
+      </Text>
+    </View>
   </TouchableOpacity>
 );
 
-// Hourly Card
-const HourlyCard = ({
+// Hourly Row
+const HourlyRow = ({
   time,
   temperature,
   icon,
   rainChance,
-  isDark,
+  isLast,
+  colors,
 }: {
   time: string;
   temperature: string;
   icon: any;
   rainChance?: number;
-  isDark: boolean;
+  isLast: boolean;
+  colors: any;
 }) => (
-  <BlurView
-    intensity={60}
-    tint={isDark ? "dark" : "light"}
+  <View
     style={{
-      width: 80,
-      borderRadius: 24,
-      overflow: "hidden",
-      marginRight: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      borderBottomWidth: isLast ? 0 : 1,
+      borderBottomColor: colors.border,
     }}
   >
-    <View
+    <Text
       style={{
-        backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.5)",
-        paddingVertical: 12,
-        alignItems: "center",
+        width: 52,
+        fontSize: 13,
+        fontFamily: "JetBrainsMono_500Medium",
+        color: colors.textSecondary,
       }}
     >
-      <Text
-        style={{
-          fontSize: 13,
-          fontWeight: "500",
-          color: isDark ? "white" : "#333",
-          marginBottom: 8,
-        }}
-      >
-        {time}
-      </Text>
-      <Image source={icon} style={{ width: 32, height: 32, marginBottom: 8 }} />
-      <Text
-        style={{
-          fontSize: 20,
-          fontWeight: "600",
-          color: isDark ? "white" : "#111",
-        }}
-      >
-        {temperature}
-      </Text>
-      {typeof rainChance === "number" && rainChance > 0 && (
-        <Text
-          style={{
-            fontSize: 10,
-            fontWeight: "500",
-            color: isDark ? "#90CAF9" : "#1565C0",
-            marginTop: 4,
-          }}
-        >
-          {rainChance}%
-        </Text>
-      )}
+      {time}
+    </Text>
+    <Image source={icon} style={{ width: 24, height: 24, marginHorizontal: 14 }} />
+    <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+      {typeof rainChance === "number" && rainChance > 0 ? (
+        <>
+          <Ionicons name="water" size={12} color={colors.accent} style={{ marginRight: 4 }} />
+          <Text
+            style={{
+              fontSize: 13,
+              fontFamily: "JetBrainsMono_500Medium",
+              color: colors.accent,
+            }}
+          >
+            {rainChance}%
+          </Text>
+        </>
+      ) : null}
     </View>
-  </BlurView>
+    <Text
+      style={{
+        fontSize: 15,
+        fontFamily: "JetBrainsMono_700Bold",
+        color: colors.textPrimary,
+        minWidth: 46,
+        textAlign: "right",
+      }}
+    >
+      {temperature}
+    </Text>
+  </View>
 );
 
 export default function Index() {
@@ -464,17 +452,17 @@ export default function Index() {
     {
       icon: "speedometer-outline",
       label: "Wiatr",
-      value: weatherData ? formatWindSpeed(weatherData.current.wind_kph) : "-",
+      value: weatherData ? formatWindSpeed(weatherData.current.wind_kph) : "–",
     },
     {
       icon: "water-outline",
       label: "Wilgotność",
-      value: weatherData ? `${weatherData.current.humidity}%` : "-",
+      value: weatherData ? `${weatherData.current.humidity}%` : "–",
     },
     {
       icon: "eye-outline",
       label: "Widoczność",
-      value: weatherData ? `${weatherData.current.vis_km} km` : "-",
+      value: weatherData ? `${weatherData.current.vis_km} km` : "–",
     },
   ];
 
@@ -504,22 +492,8 @@ export default function Index() {
     setLocationOptions([]);
   };
 
-  // Kolory tekstu w zależności od trybu
-  const textColor = isDark ? "white" : "#111";
-  const textSecondary = isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.5)";
-  const textTertiary = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)";
-
   return (
-    <LinearGradient
-      colors={isDark 
-        ? ["#0B1020", "#1B2A49", "#243B63", "#3E5C8A"]
-        : ["#E8F0FE", "#D4E4FC", "#C0D8FA", "#ACCCF8"]
-      }
-      locations={[0, 0.3, 0.7, 1]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={{ flex: 1 }}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.ground }}>
       <StatusBar style={isDark ? "light" : "dark"} />
 
       <SafeAreaView style={{ flex: 1 }}>
@@ -531,7 +505,7 @@ export default function Index() {
           showResults={showSearch}
           locations={locationOptions}
           onSelectLocation={handleLocationSelect}
-          isDark={isDark}
+          colors={colors}
         />
 
         <ScrollView
@@ -542,10 +516,9 @@ export default function Index() {
           <View style={{ alignItems: "center", marginTop: 20, marginBottom: 8 }}>
             <Text
               style={{
-                fontSize: 38,
-                fontWeight: "500",
-                color: textColor,
-                letterSpacing: -0.3,
+                fontSize: 32,
+                fontFamily: "PublicSans_600SemiBold",
+                color: colors.textPrimary,
               }}
               numberOfLines={1}
             >
@@ -553,9 +526,10 @@ export default function Index() {
             </Text>
             <Text
               style={{
-                fontSize: 14,
-                color: textSecondary,
-                marginTop: 2,
+                fontSize: 13,
+                fontFamily: "PublicSans_400Regular",
+                color: colors.textTertiary,
+                marginTop: 3,
               }}
             >
               Polska
@@ -563,10 +537,10 @@ export default function Index() {
           </View>
 
           {/* Weather Icon */}
-          <View style={{ alignItems: "center", marginVertical: 16 }}>
+          <View style={{ alignItems: "center", marginVertical: 12 }}>
             <Image
               source={getWeatherIcon(weatherData?.current?.condition?.text || "Cloudy")}
-              style={{ width: 130, height: 130 }}
+              style={{ width: 110, height: 110 }}
               resizeMode="contain"
             />
           </View>
@@ -575,20 +549,19 @@ export default function Index() {
           <View style={{ alignItems: "center" }}>
             <Text
               style={{
-                fontSize: 72,
-                fontWeight: "200",
-                color: textColor,
-                letterSpacing: -2,
+                fontSize: 64,
+                fontFamily: "JetBrainsMono_700Bold",
+                color: colors.accent,
               }}
             >
               {formatTemperature(weatherData?.current?.temp_c)}
             </Text>
             <Text
               style={{
-                fontSize: 17,
-                fontWeight: "500",
-                color: textSecondary,
-                marginTop: 6,
+                fontSize: 15,
+                fontFamily: "PublicSans_500Medium",
+                color: colors.textSecondary,
+                marginTop: 4,
               }}
             >
               {weatherData
@@ -597,66 +570,63 @@ export default function Index() {
             </Text>
           </View>
 
-          {/* Info Cards */}
-          <View style={{ flexDirection: "row", paddingHorizontal: 20, marginTop: 32 }}>
-            {weatherInfo.map((info, index) => (
-              <InfoCard key={index} icon={info.icon} label={info.label} value={info.value} isDark={isDark} />
-            ))}
+          {/* Current conditions */}
+          <View style={{ paddingHorizontal: 20, marginTop: 28 }}>
+            <ConditionStrip items={weatherInfo} colors={colors} />
           </View>
 
           {/* Daily Forecast */}
-          <View style={{ marginTop: 36, paddingHorizontal: 20 }}>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: textColor, marginBottom: 12, letterSpacing: -0.3 }}>
+          <View style={{ marginTop: 28, paddingHorizontal: 20 }}>
+            <Text style={{ fontSize: 13, fontFamily: "PublicSans_500Medium", color: colors.textTertiary, marginBottom: 8 }}>
               Prognoza dzienna
             </Text>
-            {forecast.map((day, index) => (
-              <ForecastCard
-                key={index}
-                day={day.day}
-                temperature={day.temperature}
-                high={day.high}
-                low={day.low}
-                icon={day.icon}
-                selected={selectedForecastDayIndex === index}
-                onPress={() => setSelectedForecastDayIndex(index)}
-                isDark={isDark}
-                accentColor={colors.accent}
-              />
-            ))}
+            <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
+              {forecast.map((day, index) => (
+                <ForecastRow
+                  key={index}
+                  day={day.day}
+                  temperature={day.temperature}
+                  high={day.high}
+                  low={day.low}
+                  icon={day.icon}
+                  selected={selectedForecastDayIndex === index}
+                  onPress={() => setSelectedForecastDayIndex(index)}
+                  isLast={index === forecast.length - 1}
+                  colors={colors}
+                />
+              ))}
+            </View>
           </View>
 
           {/* Hourly Forecast */}
-          <View style={{ marginTop: 28, marginBottom: 20 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, marginBottom: 12 }}>
-              <Text style={{ fontSize: 18, fontWeight: "600", color: textColor, letterSpacing: -0.3 }}>
+          <View style={{ marginTop: 24, marginBottom: 20, paddingHorizontal: 20 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+              <Text style={{ fontSize: 13, fontFamily: "PublicSans_500Medium", color: colors.textTertiary }}>
                 Prognoza godzinowa
               </Text>
               {selectedForecastDay && (
-                <Text style={{ fontSize: 14, color: textSecondary }}>
+                <Text style={{ fontSize: 12, fontFamily: "PublicSans_400Regular", color: colors.textTertiary }}>
                   {selectedForecastDay.day}
                 </Text>
               )}
             </View>
 
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingLeft: 20, paddingRight: 40 }}
-            >
+            <View style={{ borderRadius: RADIUS, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, overflow: "hidden" }}>
               {selectedForecastDay?.hours?.map((hour, index) => (
-                <HourlyCard
+                <HourlyRow
                   key={index}
                   time={hour.time}
                   temperature={hour.temperature}
                   icon={hour.icon}
                   rainChance={hour.rainChance}
-                  isDark={isDark}
+                  isLast={index === selectedForecastDay.hours.length - 1}
+                  colors={colors}
                 />
               ))}
-            </ScrollView>
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }

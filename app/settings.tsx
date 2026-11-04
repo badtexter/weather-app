@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { getCurrent } from "../api/weather";
 import { useAppTheme } from "../services/theme";
-import { useUnits } from "../services/units";
+import { TemperatureUnit, WindSpeedUnit, useUnits } from "../services/units";
 import {
   disableWeatherNotifications,
   enableWeatherNotifications,
@@ -10,9 +10,57 @@ import {
   getWeatherNotificationsEnabled,
 } from "../services/weatherNotifications";
 
+const RADIUS = 8;
+
+// A row of options where the active one takes the accent colour and a 2px
+// underline — the same selection mark used for the picked day on the weather tab.
+function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+  colors,
+}: {
+  options: Array<{ label: string; value: T }>;
+  value: T;
+  onChange: (value: T) => void;
+  colors: any;
+}) {
+  return (
+    <View style={{ flexDirection: "row" }}>
+      {options.map((option) => {
+        const active = option.value === value;
+        return (
+          <TouchableOpacity
+            key={option.value}
+            onPress={() => onChange(option.value)}
+            activeOpacity={0.6}
+            style={{
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              marginLeft: 4,
+              borderBottomWidth: 2,
+              borderBottomColor: active ? colors.accent : "transparent",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: active ? "PublicSans_600SemiBold" : "PublicSans_400Regular",
+                color: active ? colors.accent : colors.textSecondary,
+              }}
+            >
+              {option.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
 export default function Settings() {
-  const { colors, theme, toggleTheme } = useAppTheme();
-  const { temperatureUnit, windSpeedUnit, toggleTemperatureUnit, cycleWindSpeedUnit } = useUnits();
+  const { colors, theme, setTheme } = useAppTheme();
+  const { temperatureUnit, windSpeedUnit, setTemperatureUnit, setWindSpeedUnit } = useUnits();
   const [notifications, setNotifications] = useState(false);
   const [notificationPending, setNotificationPending] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState("");
@@ -66,13 +114,8 @@ export default function Settings() {
     }
   };
 
-  const textColor = theme === "light" ? "#111" : "#FFFFFF";
-  const textSecondary = theme === "light" ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.6)";
-  const textTertiary = theme === "light" ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.35)";
-  const borderColor = theme === "light" ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.08)";
-
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.ground }]}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -80,72 +123,76 @@ export default function Settings() {
       >
         {/* Wygląd */}
         <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: textSecondary }]}>Wygląd</Text>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor, borderWidth: theme === "light" ? 0 : 0.5 }]}>
-            <TouchableOpacity style={styles.cell} onPress={toggleTheme} activeOpacity={0.6}>
-              <Text style={[styles.cellLabel, { color: textColor }]}>Motyw</Text>
-              <View style={styles.cellRight}>
-                <Text style={[styles.cellValue, { color: textSecondary }]}>
-                  {theme === "light" ? "Jasny" : "Ciemny"}
-                </Text>
-                <Text style={[styles.chevron, { color: textTertiary }]}>›</Text>
-              </View>
-            </TouchableOpacity>
+          <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Wygląd</Text>
+          <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.row}>
+              <Text style={[styles.rowLabel, { color: colors.textPrimary }]}>Motyw</Text>
+              <Segmented
+                colors={colors}
+                value={theme}
+                onChange={setTheme}
+                options={[
+                  { label: "Jasny", value: "light" },
+                  { label: "Ciemny", value: "dark" },
+                ]}
+              />
+            </View>
           </View>
         </View>
 
         {/* Powiadomienia */}
         <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: textSecondary }]}>Powiadomienia</Text>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor, borderWidth: theme === "light" ? 0 : 0.5 }]}>
-            <View style={styles.cell}>
-              <Text style={[styles.cellLabel, { color: textColor }]}>Prognoza pogodowa</Text>
+          <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Powiadomienia</Text>
+          <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.row}>
+              <Text style={[styles.rowLabel, { color: colors.textPrimary }]}>Prognoza pogodowa</Text>
               <Switch
                 value={notifications}
                 onValueChange={handleNotificationsChange}
                 disabled={notificationPending}
-                trackColor={{ false: borderColor, true: "#4A90E2" }}
-                ios_backgroundColor={borderColor}
+                trackColor={{ false: colors.border, true: colors.accent }}
+                ios_backgroundColor={colors.border}
                 thumbColor="#FFFFFF"
               />
             </View>
           </View>
-          {notificationStatus ? (
-            <Text style={[styles.footerText, { color: textSecondary }]}>{notificationStatus}</Text>
-          ) : (
-            <Text style={[styles.footerText, { color: textSecondary }]}>
-              Powiadomienia będą wysyłane co 3 godziny
-            </Text>
-          )}
+          <Text style={[styles.footerText, { color: colors.textTertiary }]}>
+            {notificationStatus || "Powiadomienia będą wysyłane co 3 godziny"}
+          </Text>
         </View>
 
         {/* Jednostki */}
         <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: textSecondary }]}>Jednostki</Text>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor, borderWidth: theme === "light" ? 0 : 0.5 }]}>
-            <TouchableOpacity style={styles.cell} onPress={toggleTemperatureUnit} activeOpacity={0.6}>
-              <Text style={[styles.cellLabel, { color: textColor }]}>Temperatura</Text>
-              <View style={styles.cellRight}>
-                <Text style={[styles.cellValue, { color: "#4A90E2" }]}>
-                  {temperatureUnit === "celsius" ? "°C" : "°F"}
-                </Text>
-                <Text style={[styles.chevron, { color: textTertiary }]}>›</Text>
-              </View>
-            </TouchableOpacity>
+          <Text style={[styles.sectionHeader, { color: colors.textTertiary }]}>Jednostki</Text>
+          <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.row}>
+              <Text style={[styles.rowLabel, { color: colors.textPrimary }]}>Temperatura</Text>
+              <Segmented<TemperatureUnit>
+                colors={colors}
+                value={temperatureUnit}
+                onChange={setTemperatureUnit}
+                options={[
+                  { label: "°C", value: "celsius" },
+                  { label: "°F", value: "fahrenheit" },
+                ]}
+              />
+            </View>
 
-            <View style={[styles.separator, { backgroundColor: borderColor }]} />
+            <View style={[styles.separator, { backgroundColor: colors.border }]} />
 
-            <TouchableOpacity style={styles.cell} onPress={cycleWindSpeedUnit} activeOpacity={0.6}>
-              <Text style={[styles.cellLabel, { color: textColor }]}>Prędkość wiatru</Text>
-              <View style={styles.cellRight}>
-                <Text style={[styles.cellValue, { color: "#4A90E2" }]}>
-                  {windSpeedUnit === "kmh" && "km/h"}
-                  {windSpeedUnit === "ms" && "m/s"}
-                  {windSpeedUnit === "mph" && "mph"}
-                </Text>
-                <Text style={[styles.chevron, { color: textTertiary }]}>›</Text>
-              </View>
-            </TouchableOpacity>
+            <View style={styles.row}>
+              <Text style={[styles.rowLabel, { color: colors.textPrimary }]}>Prędkość wiatru</Text>
+              <Segmented<WindSpeedUnit>
+                colors={colors}
+                value={windSpeedUnit}
+                onChange={setWindSpeedUnit}
+                options={[
+                  { label: "km/h", value: "kmh" },
+                  { label: "m/s", value: "ms" },
+                  { label: "mph", value: "mph" },
+                ]}
+              />
+            </View>
           </View>
         </View>
 
@@ -163,59 +210,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    marginTop: 15,
     paddingTop: 24,
   },
   section: {
-    marginBottom: 28,
+    marginBottom: 24,
   },
   sectionHeader: {
     fontSize: 13,
-    fontWeight: "500",
+    fontFamily: "PublicSans_500Medium",
     marginLeft: 20,
     marginBottom: 8,
   },
-  card: {
-    borderRadius: 16,
-    marginHorizontal: 16,
+  panel: {
+    borderRadius: RADIUS,
+    borderWidth: 1,
+    marginHorizontal: 20,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 1,
   },
-  cell: {
+  row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
-  cellLabel: {
-    fontSize: 16,
-    fontWeight: "400",
-  },
-  cellRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  cellValue: {
-    fontSize: 16,
-    fontWeight: "400",
-  },
-  chevron: {
-    fontSize: 20,
-    fontWeight: "300",
-    marginTop: -2,
+  rowLabel: {
+    fontSize: 15,
+    fontFamily: "PublicSans_400Regular",
   },
   separator: {
-    height: 0.5,
-    marginLeft: 18,
+    height: 1,
+    marginHorizontal: 16,
   },
   footerText: {
     fontSize: 12,
+    fontFamily: "PublicSans_400Regular",
     marginLeft: 20,
     marginTop: 8,
   },

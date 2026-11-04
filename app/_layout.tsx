@@ -1,10 +1,41 @@
+import { JetBrainsMono_500Medium, JetBrainsMono_700Bold } from "@expo-google-fonts/jetbrains-mono";
+import {
+  PublicSans_400Regular,
+  PublicSans_500Medium,
+  PublicSans_600SemiBold,
+  PublicSans_700Bold,
+} from "@expo-google-fonts/public-sans";
+import { useFonts } from "expo-font";
 import { Feather } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppThemeProvider, useAppTheme } from "../services/theme";
 import { UnitsProvider } from "../services/units";
 
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    PublicSans_400Regular,
+    PublicSans_500Medium,
+    PublicSans_600SemiBold,
+    PublicSans_700Bold,
+    JetBrainsMono_500Medium,
+    JetBrainsMono_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <AppThemeProvider>
       <UnitsProvider>
@@ -33,7 +64,7 @@ function RootTabs() {
           tabBarInactiveTintColor: colors.textSecondary,
           tabBarLabelStyle: {
             fontSize: 11,
-            fontWeight: "500",
+            fontFamily: "PublicSans_500Medium",
           },
           headerStyle: {
             backgroundColor: colors.tabBackground,
@@ -41,7 +72,7 @@ function RootTabs() {
           headerShadowVisible: false,
           headerTitleStyle: {
             fontSize: 26,
-            fontWeight: "600",
+            fontFamily: "PublicSans_600SemiBold",
             color: colors.textPrimary,
           },
           headerTitleAlign: "center",
